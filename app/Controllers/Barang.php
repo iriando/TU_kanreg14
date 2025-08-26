@@ -20,20 +20,9 @@ class Barang extends BaseController
     {
         $barang = $this->barangModel->findAll();
 
-        foreach ($barang as &$b) {
-            $dipinjam = $this->peminjamanModel
-                ->selectSum('jumlah')
-                ->where('kode_barang', $b['kode_barang'])
-                ->where('status', 'Dipinjam')
-                ->get()
-                ->getRow()
-                ->jumlah ?? 0;
-
-            $b['dipinjam'] = $dipinjam;
-            $b['sisa']     = $b['jumlah'] - $dipinjam;
-        }
-
-        return view('admin/barang/index', ['barang' => $barang]);
+        return view('admin/barang/index', [
+            'barang' => $barang,
+        ]);
     }
 
     public function create()

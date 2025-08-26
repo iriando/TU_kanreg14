@@ -90,4 +90,73 @@ class Peminjaman extends BaseController
         $this->peminjamanModel->setKembali($id, user()->username);
         return redirect()->to('/peminjaman')->with('message', 'Status peminjaman diupdate menjadi Kembali');
     }
+
+    public function formKembali($id)
+    {
+        $peminjaman = $this->peminjamanModel->getById($id);
+        if (!$peminjaman) {
+            throw new \CodeIgniter\Exceptions\PageNotFoundException('Peminjaman tidak ditemukan');
+        }
+
+        return view('peminjaman/form_kembali', [
+            'peminjaman' => $peminjaman
+        ]);
+    }
+
+    public function prosesKembali($id)
+    {
+        $peminjaman = $this->peminjamanModel->find($id);
+
+        if (!$peminjaman) {
+            return redirect()->back()->with('error', 'Data peminjaman tidak ditemukan');
+        }
+
+        $barang = $this->barangModel
+            ->where('kode_barang', $peminjaman->kode_barang)
+            ->first();
+
+        if (!$barang) {
+            return redirect()->back()->with('error', 'Data barang tidak ditemukan');
+        }
+
+        $jumlahKembali = $this->request->getPost('jumlah_kembali');
+
+        // validasi
+        if ($jumlahKembali > $peminjaman->jumlah) {
+            return redirect()->back()->with('error', 'Jumlah kembali melebihi jumlah yang dipinjam');
+        }
+
+        $sisaPinjam = $peminjaman->jumlah - $jumlahKembali;
+
+        // update stok barang
+        $this->barangModel->update($barang['id'], [
+            'dipinjam' => $barang['dipinjam'] - $jumlahKembali,
+            'sisa'     => $barang['sisa'] + $jumlahKembali,
+        ]);
+
+        // masukkan riwayat baru
+        $this->peminjamanModel->insert([
+            'kode_barang'    => $peminjaman->kode_barang,
+            'nama_peminjam'       => $peminjaman->nama_peminjam,
+            'jumlah'         => $jumlahKembali,
+            'jumlah'         => $jumlahKembali,
+            'status'         => 'Dikembalikan',
+            'tanggal_pinjam' => $peminjaman->tanggal_pinjam,
+            'tanggal_kembali'=> date('Y-m-d H:i:s'),
+            'petugas'         => user()->username,
+        ]);
+
+        if ($sisaPinjam > 0) {
+            $this->peminjamanModel->update($id, [
+                'jumlah' => $sisaPinjam,
+                'status' => 'Dipinjam',
+                'petugas'  => user()->username,
+            ]);
+        } else {
+            $this->peminjamanModel->delete($id);
+        }
+
+        return redirect()->to('/peminjaman')->with('success', 'Pengembalian berhasil diproses');
+    }
+
 }

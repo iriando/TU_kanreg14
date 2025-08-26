@@ -10,10 +10,14 @@
         </div>
     </div>
     <div class="card-body table-responsive">
+        <?php if(session()->getFlashdata('error')): ?>
+            <div class="alert alert-danger"><?= session()->getFlashdata('error') ?></div>
+        <?php endif; ?>
+        
         <table id="peminjamanTable" class="table table-bordered table-hover">
             <thead>
                 <tr>
-                    <th>ID</th>
+                    <th>No</th> <!-- Tambah nomor urut -->
                     <th>Nama Peminjam</th>
                     <th>Nama Barang</th>
                     <th>Kode Barang</th>
@@ -27,9 +31,9 @@
             </thead>
             <tbody>
                 <?php if (!empty($peminjaman)): ?>
-                    <?php foreach($peminjaman as $p): ?>
+                    <?php foreach($peminjaman as $i => $p): ?>
                         <tr>
-                            <td><?= $p->id ?></td>
+                            <td><?= $i+1 ?></td> <!-- Nomor urut -->
                             <td><?= $p->nama_peminjam ?></td>
                             <td><?= $p->nama_barang ?></td>
                             <td><?= $p->kode_barang ?></td>
@@ -49,8 +53,10 @@
                                     <a href="<?= site_url('peminjaman/edit/'.$p->id) ?>" class="btn btn-warning btn-sm">Edit</a>
                                     <a href="<?= site_url('peminjaman/delete/'.$p->id) ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin hapus?')">Hapus</a>
                                 <?php endif; ?>
-                                <?php if($p->status === 'Dipinjam'): ?>
-                                    <a href="<?= site_url('peminjaman/dikembalikan/'.$p->id) ?>" class="btn btn-success btn-sm" onclick="return confirm('Ubah status menjadi Kembali?')">Dikembalikan</a>
+                                <?php if($p->status === 'Dipinjam' && ($p->jumlah_kembali < $p->jumlah)): ?>
+                                    <button class="btn btn-success btn-sm" onclick="kembalikan(<?= $p->id ?>)">
+                                        Kembalikan
+                                    </button>
                                 <?php endif; ?>
                             </td>
                         </tr>
@@ -62,6 +68,40 @@
                 <?php endif; ?>
             </tbody>
         </table>
+
+        <!-- Modal -->
+        <div class="modal fade" id="modalKembalikan" tabindex="-1">
+        <div class="modal-dialog">
+            <form id="formKembalikan" method="post">
+            <?= csrf_field() ?>
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title">Pengembalian Barang</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Jumlah yang dikembalikan</label>
+                        <input type="number" name="jumlah_kembali" class="form-control" min="1" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </div>
+            </form>
+        </div>
+        </div>
+
+        <script>
+        function kembalikan(id) {
+            let url = "<?= site_url('peminjaman/prosesKembali') ?>/" + id;
+            $('#formKembalikan').attr('action', url);
+            $('#modalKembalikan').modal('show');
+        }
+        </script>
+
     </div>
 </div>
 

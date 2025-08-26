@@ -40,7 +40,7 @@ $routes->group('peminjaman', ['namespace' => 'App\Controllers'], function($route
     $routes->get('/', 'Peminjaman::index');
     $routes->get('create', 'Peminjaman::create');
     $routes->post('store', 'Peminjaman::store');
-    $routes->get('dikembalikan/(:num)', 'Peminjaman::dikembalikan/$1');
+    $routes->post('prosesKembali/(:num)', 'Peminjaman::prosesKembali/$1');
     $routes->group('', ['filter' => 'role:admin'], function($routes) {
         $routes->get('edit/(:num)', 'Peminjaman::edit/$1');
         $routes->post('update/(:num)', 'Peminjaman::update/$1');
