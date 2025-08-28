@@ -4,48 +4,59 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class CreateBarangUnit extends Migration
+class CreateBarangUnitTable extends Migration
 {
     public function up()
     {
         $this->forge->addField([
-            'id' => [
+            'id'          => [
                 'type'           => 'INT',
                 'constraint'     => 11,
                 'unsigned'       => true,
                 'auto_increment' => true,
             ],
-            'barang_id' => [
-                'type'       => 'INT',
-                'constraint' => 11,
-                'unsigned'   => true,
+            'kode_barang' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 20,
             ],
-            'nomor_urut' => [
-                'type'       => 'INT',
-                'constraint' => 5,
-                'unsigned'   => true,
+            'kode_unit'   => [
+                'type'       => 'VARCHAR',
+                'constraint' => 50,
             ],
-            'status' => [
-                'type'       => 'ENUM',
-                'constraint' => ['tersedia', 'dipinjam'],
+            'merk'        => [
+                'type'       => 'VARCHAR',
+                'constraint' => 100,
+                'null'       => true,
+            ],
+            'status'      => [
+                'type'       => 'varchar',
+                'constraint' => 20,
                 'default'    => 'tersedia',
             ],
-            'created_at' => [
+            'kondisi'      => [
+                'type'       => 'varchar',
+                'constraint' => 20,
+                'default'    => 'baik',
+            ],
+            'created_at'  => [
                 'type' => 'DATETIME',
                 'null' => true,
             ],
-            'updated_at' => [
+            'updated_at'  => [
                 'type' => 'DATETIME',
                 'null' => true,
             ],
         ]);
+
         $this->forge->addKey('id', true);
-        $this->forge->addForeignKey('barang_id', 'barang_master', 'id', 'CASCADE', 'CASCADE');
-        $this->forge->createTable('barang_unit', true);
+        $this->forge->addForeignKey('kode_barang', 'barang_master', 'kode_barang', 'CASCADE', 'CASCADE');
+        $this->forge->addUniqueKey(['kode_barang', 'kode_unit']);
+        $this->forge->createTable('barang_unit', true, ['ENGINE' => 'InnoDB', 'CHARSET' => 'utf8mb4', 'COLLATE' => 'utf8mb4_0900_ai_ci']);
+
     }
 
     public function down()
     {
-        $this->forge->dropTable('barang_unit', true);
+        $this->forge->dropTable('barang_unit');
     }
 }

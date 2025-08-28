@@ -12,7 +12,13 @@ class BarangUnitModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['barang_id', 'nomor_urut', 'status'];
+    protected $allowedFields    = [
+        'kode_barang',
+        'kode_unit',
+        'merk',
+        'status',
+        'kondisi',
+    ];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
@@ -21,7 +27,7 @@ class BarangUnitModel extends Model
     protected array $castHandlers = [];
 
     // Dates
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
@@ -30,7 +36,7 @@ class BarangUnitModel extends Model
     // Validation
     protected $validationRules      = [];
     protected $validationMessages   = [];
-    protected $skipValidation       = false;
+    protected $skipValidation       = true;
     protected $cleanValidationRules = true;
 
     // Callbacks
@@ -44,10 +50,8 @@ class BarangUnitModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getUnitsByMaster($masterId)
+    public function getByKodeBarang($kode_barang)
     {
-        return $this->where('barang_id', $masterId)
-                    ->orderBy('nomor_urut', 'ASC')
-                    ->findAll();
+        return $this->where('kode_barang', $kode_barang)->findAll();
     }
 }

@@ -54,11 +54,11 @@ class CreateObatTables extends Migration
         ]);
 
         $this->forge->addKey('id', true);
-        $this->forge->createTable('obat');
+        $this->forge->createTable('obat', true);
     }
 
     public function down()
     {
-        $this->forge->dropTable('obat');
+        $this->forge->dropTable('obat', true);
     }
 }

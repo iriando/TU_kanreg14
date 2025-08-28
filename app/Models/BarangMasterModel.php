@@ -12,7 +12,14 @@ class BarangMasterModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['kode_barang', 'nama_barang', 'kategori', 'keterangan'];
+    protected $allowedFields    = [
+        'kode_barang',
+        'nama_barang',
+        'kategori',
+        'keterangan',
+        'created_at',
+        'updated_at'
+    ];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
@@ -21,7 +28,7 @@ class BarangMasterModel extends Model
     protected array $castHandlers = [];
 
     // Dates
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
@@ -44,21 +51,46 @@ class BarangMasterModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getRekap()
+    protected $barangUnitModel;
+
+    public function __construct()
     {
-        return $this->select('
-                bm.id,
-                bm.kode_barang,
-                bm.nama_barang,
-                bm.kategori,
-                bm.keterangan,
-                COUNT(bu.id) as jumlah,
-                SUM(CASE WHEN bu.status = "dipinjam" THEN 1 ELSE 0 END) as dipinjam,
-                COUNT(bu.id) - SUM(CASE WHEN bu.status = "dipinjam" THEN 1 ELSE 0 END) as sisa
-            ')
-            ->from('barang_master bm')
-            ->join('barang_unit bu', 'bu.barang_id = bm.id', 'left')
-            ->groupBy('bm.id, bm.kode_barang, bm.nama_barang, bm.kategori, bm.keterangan')
-            ->findAll();
+        parent::__construct();
+        $this->barangUnitModel = new \App\Models\BarangUnitModel();
+    }
+
+    public function saveWithUnits(array $dataMaster, array $units = [])
+    {
+        $db = \Config\Database::connect();
+        $db->transStart();
+
+        // simpan master
+        $this->insert($dataMaster);
+
+        $kodeBarang = $dataMaster['kode_barang'];
+
+        // simpan unit
+        if (!empty($units)) {
+            foreach ($units as $unit) {
+                $this->barangUnitModel->insert([
+                    'kode_barang' => $kodeBarang,
+                    'kode_unit'   => $unit['kode_unit'],
+                    'merk'        => $unit['merk'] ?? null,
+                    'status'      => $unit['status'] ?? null,
+                ]);
+            }
+        }
+
+        $db->transComplete();
+
+        return $db->transStatus();
+    }
+
+    public function getWithUnits()
+    {
+        return $this->select('barang_master.*, COUNT(barang_unit.kode_unit) as total_unit')
+                    ->join('barang_unit', 'barang_unit.kode_barang = barang_master.kode_barang', 'left')
+                    ->groupBy('barang_master.kode_barang')
+                    ->findAll();
     }
 }

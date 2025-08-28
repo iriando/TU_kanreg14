@@ -53,10 +53,15 @@ $routes->group('barang', ['namespace' => 'App\Controllers'], function($routes) {
     $routes->group('', ['filter' => 'role:admin'], function($routes) {
         $routes->get('create', 'Barang::create');
         $routes->post('store', 'Barang::store');
-        $routes->get('detail/(:num)', 'Barang::detail/$1');
         $routes->get('edit/(:num)', 'Barang::edit/$1');
         $routes->post('update/(:num)', 'Barang::update/$1');
         $routes->get('delete/(:num)', 'Barang::delete/$1');
+        $routes->get('detail/(:segment)', 'Barang::detail/$1');
+        $routes->get('create-unit/(:segment)', 'Barang::createUnit/$1');
+        $routes->post('store-unit/(:segment)', 'Barang::StoreUnit/$1');
+        $routes->get('edit-unit/(:num)', 'Barang::editUnit/$1');
+        $routes->post('update-unit/(:num)', 'Barang::updateUnit/$1');
+        $routes->get('delete-unit/(:num)', 'Barang::deleteUnit/$1');
     });
 });
 

@@ -55,11 +55,11 @@ class CreateLogDistribusiobatTables extends Migration
         ]);
 
         $this->forge->addKey('id', true);
-        $this->forge->createTable('log_distribusiobat');
+        $this->forge->createTable('log_distribusiobat', true);
     }
 
     public function down()
     {
-        $this->forge->dropTable('obat');
+        $this->forge->dropTable('log_distribusiobat', true);
     }
 }

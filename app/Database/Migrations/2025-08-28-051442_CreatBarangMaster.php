@@ -4,12 +4,12 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class CreatBarangMaster extends Migration
+class CreateBarangMasterTable extends Migration
 {
     public function up()
     {
         $this->forge->addField([
-            'id' => [
+            'id'          => [
                 'type'           => 'INT',
                 'constraint'     => 11,
                 'unsigned'       => true,
@@ -17,21 +17,19 @@ class CreatBarangMaster extends Migration
             ],
             'kode_barang' => [
                 'type'       => 'VARCHAR',
-                'constraint' => 50,
-                'unique'     => true,
+                'constraint' => 20,
             ],
             'nama_barang' => [
                 'type'       => 'VARCHAR',
-                'constraint' => 255,
+                'constraint' => 100,
             ],
             'kategori' => [
                 'type'       => 'VARCHAR',
-                'constraint' => 100,
-                'null'       => true,
+                'constraint' => 50,
             ],
             'keterangan' => [
-                'type' => 'TEXT',
-                'null' => true,
+                'type'       => 'TEXT',
+                'null'       => true,
             ],
             'created_at' => [
                 'type' => 'DATETIME',
@@ -42,12 +40,14 @@ class CreatBarangMaster extends Migration
                 'null' => true,
             ],
         ]);
-        $this->forge->addKey('id', true);
-        $this->forge->createTable('barang_master', true);
+        
+        $this->forge->addKey('id', true); // primary key
+        $this->forge->addUniqueKey(['kode_barang']);
+        $this->forge->createTable('barang_master', true, ['ENGINE' => 'InnoDB', 'CHARSET' => 'utf8mb4', 'COLLATE' => 'utf8mb4_0900_ai_ci']);
     }
 
     public function down()
     {
-        $this->forge->dropTable('barang_master', true);
+        $this->forge->dropTable('barang_master');
     }
 }

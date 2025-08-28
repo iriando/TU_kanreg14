@@ -12,7 +12,14 @@ class BarangModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['kode_barang','nama_barang','kategori', 'jumlah', 'dipinjam', 'sisa', 'keterangan', 'updated_at'];
+    protected $allowedFields    = [
+        'kode_unit',
+        'kode_barang',
+        'merk',
+        'status',
+        'created_at',
+        'updated_at'
+    ];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;

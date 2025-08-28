@@ -2,100 +2,180 @@
 
 namespace App\Controllers;
 
-use App\Models\BarangModel;
-use App\Models\PeminjamanModel;
+use App\Models\BarangMasterModel;
+use App\Models\BarangUnitModel;
+use CodeIgniter\Controller;
 
-class Barang extends BaseController
+class Barang extends Controller
 {
-    protected $barangModel;
-    protected $peminjamanModel;
+    protected $barangMaster;
+    protected $barangUnit;
 
     public function __construct()
     {
-        $this->barangModel = new BarangModel();
-        $this->peminjamanModel = new PeminjamanModel();
+        $this->barangMaster = new BarangMasterModel();
+        $this->barangUnit   = new BarangUnitModel();
     }
 
     public function index()
     {
-        $barang = $this->barangModel->findAll();
-
-        return view('admin/barang/index', [
-            'barang' => $barang,
-        ]);
+        $data['barang'] = $this->barangMaster->getWithUnits();
+        return view('admin/barang/index', $data);
     }
 
+    // Halaman form create
     public function create()
     {
         return view('admin/barang/create');
     }
 
-    public function store()
+    public function delete($id = null)
     {
-        $rules = [
-            'kode_barang' => 'required|is_unique[barang.kode_barang]',
-            'nama_barang' => 'required',
-            'kategori'    => 'required',
-            'jumlah'      => 'required|integer',
-        ];
-
-        if (!$this->validate($rules)) {
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        if (!$id) {
+            return redirect()->back()->with('error', 'ID barang tidak ditemukan');
         }
 
-        $this->barangModel->insert([
+        // ambil barang master dulu
+        $barang = $this->barangMaster->find($id);
+        if (!$barang) {
+            return redirect()->back()->with('error', 'Barang tidak ditemukan');
+        }
+
+        // hapus barang master (barang_unit akan otomatis terhapus karena FK CASCADE)
+        $this->barangMaster->delete($id);
+
+        return redirect()->to('/barang')->with('success', 'Barang berhasil dihapus');
+    }
+
+    public function store()
+    {
+        $dataMaster = [
             'kode_barang' => $this->request->getPost('kode_barang'),
             'nama_barang' => $this->request->getPost('nama_barang'),
             'kategori'    => $this->request->getPost('kategori'),
-            'jumlah'      => $this->request->getPost('jumlah'),
             'keterangan'  => $this->request->getPost('keterangan'),
-            'dipinjam'    => 0,
-            'sisa'        => $this->request->getPost('jumlah'),
-        ]);
-
-        return redirect()->to('/barang')->with('message', 'Barang berhasil ditambahkan');
-    }
-
-    public function edit($id)
-    {
-        $barang = $this->barangModel->find($id);
-        if (!$barang) {
-            throw new \CodeIgniter\Exceptions\PageNotFoundException('Barang tidak ditemukan');
-        }
-        return view('admin/barang/edit', ['barang' => $barang]);
-    }
-
-    public function update($id)
-    {
-        $rules = [
-            'nama_barang' => 'required',
-            'kategori'    => 'required',
-            'jumlah'      => 'required|integer',
         ];
 
-        if (!$this->validate($rules)) {
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        $units = $this->request->getPost('units');
+
+        $success = $this->barangMaster->saveWithUnits($dataMaster, $units);
+
+        if ($success) {
+            return redirect()->to('/barang')->with('success', 'Barang berhasil ditambahkan');
         }
 
-        $barang = $this->barangModel->find($id);
-        if (!$barang) {
+        return redirect()->back()->withInput()->with('error', 'Gagal menyimpan data');
+    }
+
+    public function detail($kode_barang)
+    {
+        $barangMaster = $this->barangMaster->where('kode_barang', $kode_barang)->first();
+
+        if (!$barangMaster) {
             return redirect()->to('/barang')->with('error', 'Barang tidak ditemukan');
         }
 
-        $this->barangModel->update($id, [
-            'nama_barang' => $this->request->getPost('nama_barang'),
-            'kategori'    => $this->request->getPost('kategori'),
-            'jumlah'      => $this->request->getPost('jumlah'),
-            'keterangan'  => $this->request->getPost('keterangan'),
-            'sisa'        => $this->request->getPost('jumlah') - $barang['dipinjam'],
-        ]);
+        $units = $this->barangUnit->getByKodeBarang($kode_barang);
 
-        return redirect()->to('/barang')->with('message', 'Barang berhasil diupdate');
+        $data = [
+            'barang' => $barangMaster,
+            'units'  => $units
+        ];
+
+        return view('admin/barang/detail', $data);
     }
 
-    public function delete($id)
+    public function createUnit($kode_barang)
     {
-        $this->barangModel->delete($id);
-        return redirect()->to('/barang')->with('message', 'Barang berhasil dihapus');
+        $barang = $this->barangMaster->where('kode_barang', $kode_barang)->first();
+
+        if (!$barang) {
+            return redirect()->to('/barang')->with('error', 'Barang tidak ditemukan.');
+        }
+
+        return view('admin/barang/create_unit', [
+            'kode_barang' => $kode_barang,
+            'barang' => $barang
+        ]);
     }
+    
+    public function storeUnit($kode_barang)
+    {
+        $barang = $this->barangMaster->where('kode_barang', $kode_barang)->first();
+
+        if (!$barang) {
+            return redirect()->to('/barang')->with('error', 'Barang tidak ditemukan.');
+        }
+
+        $data = [
+            'kode_barang' => $kode_barang,
+            'kode_unit'   => $this->request->getPost('kode_unit'),
+            'merk'        => $this->request->getPost('merk'),
+            'status'      => $this->request->getPost('status'),
+            'kondisi'     => $this->request->getPost('kondisi'),
+        ];
+
+        if ($this->barangUnit->insert($data)) {
+            return redirect()->to('/barang/detail/' . $kode_barang)
+                ->with('success', 'Unit berhasil ditambahkan.');
+        }
+
+        return redirect()->back()->withInput()->with('error', 'Gagal menambahkan unit.');
+    }
+
+    public function editUnit($id)
+    {
+        $unit = $this->barangUnit->find($id);
+
+        if (!$unit) {
+            throw new \CodeIgniter\Exceptions\PageNotFoundException("Unit tidak ditemukan.");
+        }
+
+        return view('admin/barang/edit_unit', [
+            'unit' => $unit
+        ]);
+    }
+
+    public function updateUnit($id)
+    {
+        $unit = $this->barangUnit->find($id);
+
+        if (!$unit) {
+            return redirect()->to('/barang')->with('error', 'Unit tidak ditemukan.');
+        }
+
+        $data = [
+            'kode_unit' => $this->request->getPost('kode_unit'),
+            'merk'      => $this->request->getPost('merk'),
+            'status'    => $this->request->getPost('status'),
+            'kondisi'   => $this->request->getPost('kondisi'),
+        ];
+
+        if ($this->barangUnit->update($id, $data)) {
+            return redirect()->to('/barang/detail/' . $unit['kode_barang'])
+                ->with('success', 'Unit berhasil diperbarui.');
+        }
+
+        return redirect()->back()->withInput()->with('error', 'Gagal memperbarui unit.');
+    }
+
+
+    // Hapus Unit
+    public function deleteUnit($id)
+    {
+        $unit = $this->barangUnit->find($id);
+
+        if (!$unit) {
+            throw new \CodeIgniter\Exceptions\PageNotFoundException("Unit tidak ditemukan.");
+        }
+
+        if ($this->barangUnit->delete($id)) {
+            return redirect()->to('/barang/detail/' . $unit['kode_barang'])
+                ->with('success', 'Unit berhasil dihapus.');
+        } else {
+            return redirect()->back()
+                ->with('error', 'Gagal menghapus unit.');
+        }
+    }
+
 }
