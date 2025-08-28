@@ -4,7 +4,7 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class CreateBarangTables extends Migration
+class CreatBarangMaster extends Migration
 {
     public function up()
     {
@@ -29,39 +29,25 @@ class CreateBarangTables extends Migration
                 'constraint' => 100,
                 'null'       => true,
             ],
-            'jumlah' => [
-                'type'       => 'INT',
-                'constraint' => 11,
-                'default'    => 1,
-            ],
-            'dipinjam' => [
-                'type'       => 'INT',
-                'default'    => 0,
-            ],
-            'sisa' => [
-                'type'       => 'INT',
-                'default'    => 0,
-            ],
             'keterangan' => [
                 'type' => 'TEXT',
                 'null' => true,
             ],
             'created_at' => [
-                'type'    => 'DATETIME',
-                'null'    => true,
+                'type' => 'DATETIME',
+                'null' => true,
             ],
             'updated_at' => [
-                'type'    => 'DATETIME',
-                'null'    => true,
+                'type' => 'DATETIME',
+                'null' => true,
             ],
         ]);
-
-        $this->forge->addKey('id', true); // primary key
-        $this->forge->createTable('barang', true);
+        $this->forge->addKey('id', true);
+        $this->forge->createTable('barang_master', true);
     }
 
     public function down()
     {
-        $this->forge->dropTable('barang', true);
+        $this->forge->dropTable('barang_master', true);
     }
 }

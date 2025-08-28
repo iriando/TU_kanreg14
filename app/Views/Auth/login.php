@@ -14,13 +14,13 @@
 <div class="login-box">
   <!-- Logo -->
   <div class="login-logo">
-    <a href="#"><b>BMN</b> Apps</a>
+    <a href="#"><b>Aplikasi</b> Tata Usaha <b>Kanreg XIV BKN<b></a>
   </div>
 
   <!-- Card -->
   <div class="card">
     <div class="card-body login-card-body">
-      <p class="login-box-msg">Silakan login untuk masuk ke sistem</p>
+      <p class="login-box-msg">Form Login</p>
 
       <!-- Form Login -->
       <form action="<?= url_to('login') ?>" method="post">
@@ -43,13 +43,13 @@
         </div>
 
         <!-- Remember Me -->
-        <div class="row">
+        <!-- <div class="row">
           <div class="col-8">
             <div class="icheck-primary">
               <input type="checkbox" id="remember" name="remember">
               <label for="remember">Ingat Saya</label>
             </div>
-          </div>
+          </div> -->
           <div class="col-4">
             <button type="submit" class="btn btn-primary btn-block">Login</button>
           </div>
@@ -63,12 +63,12 @@
         </div>
       <?php endif; ?>
 
-      <p class="mb-1 mt-3">
-        <a href="<?= url_to('forgot') ?>">Lupa Password?</a>
+      <!-- <p class="mb-1 mt-3">
+        <a href="<//?= url_to('forgot') ?>">Lupa Password?</a>
       </p>
       <p class="mb-0">
-        <a href="<?= url_to('register') ?>" class="text-center">Daftar akun baru</a>
-      </p>
+        <a href="<//?= url_to('register') ?>" class="text-center">Daftar akun baru</a>
+      </p> -->
     </div>
   </div>
 </div>

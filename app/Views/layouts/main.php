@@ -44,18 +44,64 @@
 <script src="<?= base_url('adminlte/plugins/datatables-responsive/js/responsive.bootstrap4.min.js') ?>"></script>
 <script src="<?= base_url('adminlte/plugins/datatables-buttons/js/dataTables.buttons.min.js') ?>"></script>
 <script src="<?= base_url('adminlte/plugins/datatables-buttons/js/buttons.bootstrap4.min.js') ?>"></script>
+<script src="<?= base_url('adminlte/plugins/jszip/jszip.min.js') ?>"></script>
+<script src="<?= base_url('adminlte/plugins/pdfmake/pdfmake.min.js') ?>"></script>
+<script src="<?= base_url('adminlte/plugins/pdfmake/vfs_fonts.js') ?>"></script>
+<script src="<?= base_url('adminlte/plugins/datatables-buttons/js/buttons.html5.min.js') ?>"></script>
+<script src="<?= base_url('adminlte/plugins/datatables-buttons/js/buttons.print.min.js') ?>"></script>
+<script src="<?= base_url('adminlte/plugins/datatables-buttons/js/buttons.colVis.min.js') ?>"></script>
 
 <script>
   $(document).ready(function () {
-    $('table.table').DataTable({
+    var t = $('table.table').DataTable({
       responsive: true,
       autoWidth: false,
       pageLength: 10,
       lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Semua"]],
       language: {
         url: "<?= base_url('adminlte/plugins/datatables/i18n/Indonesian.json') ?>"
-      }
+      },
+      columnDefs: [
+        {
+          searchable: false,
+          orderable: false,
+          targets: 0   // kolom pertama untuk nomor
+        }
+      ],
+      order: [[1, 'asc']],
+      dom: 'Bfrtip', // <== ini penting untuk menampilkan tombol export
+      buttons: [
+        {
+          extend: 'excelHtml5',
+          text: '<i class="fas fa-file-excel"></i> Excel',
+          className: 'btn btn-success btn-sm'
+        },
+        {
+          extend: 'pdfHtml5',
+          text: '<i class="fas fa-file-pdf"></i> PDF',
+          className: 'btn btn-danger btn-sm'
+        },
+        {
+          extend: 'print',
+          text: '<i class="fas fa-print"></i> Print',
+          className: 'btn btn-info btn-sm'
+        },
+        // {
+        //   extend: 'colvis',
+        //   text: '<i class="fas fa-eye"></i> Kolom',
+        //   className: 'btn btn-secondary btn-sm'
+        // }
+      ]
     });
+
+    // bikin nomor urut ulang tiap kali redraw (paging, sort, search)
+    t.on('order.dt search.dt', function () {
+      t.column(0, { search: 'applied', order: 'applied' })
+        .nodes()
+        .each(function (cell, i) {
+          cell.innerHTML = i + 1;
+        });
+    }).draw();
   });
 </script>
 </body>

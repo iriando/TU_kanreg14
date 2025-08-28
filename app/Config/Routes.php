@@ -53,6 +53,7 @@ $routes->group('barang', ['namespace' => 'App\Controllers'], function($routes) {
     $routes->group('', ['filter' => 'role:admin'], function($routes) {
         $routes->get('create', 'Barang::create');
         $routes->post('store', 'Barang::store');
+        $routes->get('detail/(:num)', 'Barang::detail/$1');
         $routes->get('edit/(:num)', 'Barang::edit/$1');
         $routes->post('update/(:num)', 'Barang::update/$1');
         $routes->get('delete/(:num)', 'Barang::delete/$1');
@@ -100,6 +101,17 @@ $routes->group('obat', ['namespace' => 'App\Controllers'], function($routes) {
         $routes->get('edit/(:num)', 'Obat::edit/$1');
         $routes->post('update/(:num)', 'Obat::update/$1');
         $routes->get('delete/(:num)', 'Obat::delete/$1');
+    });
+});
+
+$routes->group('maintenance', ['namespace' => 'App\Controllers'], function($routes) {
+    $routes->get('/', 'Maintenance::index');
+    $routes->get('create', 'Maintenance::create');
+    $routes->post('store', 'Maintenance::store');
+    $routes->group('', ['filter' => 'role:admin'], function($routes) {
+        $routes->get('edit/(:num)', 'Maintenance::edit/$1');
+        $routes->post('update/(:num)', 'Maintenance::update/$1');
+        $routes->get('delete/(:num)', 'Maintenance::delete/$1');
     });
 });
 

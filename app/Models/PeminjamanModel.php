@@ -20,7 +20,8 @@ class PeminjamanModel extends Model
         'tanggal_pinjam',
         'tanggal_kembali',
         'status',
-        'petugas',
+        'petugas_pinjam',
+        'petugas_kembalikan',
         'created_at',
         'updated_at'
     ];
@@ -81,7 +82,7 @@ class PeminjamanModel extends Model
             'tanggal_pinjam' => $data['tanggal_pinjam'],
             'tanggal_kembali'=> $data['tanggal_kembali'] ?? null,
             'status'         => 'Dipinjam',
-            'petugas'        => $petugas,
+            'petugas_pinjam' => $petugas,
             'created_at'     => date('Y-m-d H:i:s')
         ]);
 

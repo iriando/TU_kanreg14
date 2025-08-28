@@ -44,7 +44,11 @@ class CreateLogPeminjamanTables extends Migration
                 'constraint' => 20,
                 'default'    => 'Dipinjam',
             ],
-            'petugas' => [
+            'petugas_pinjam' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 255,
+            ],
+            'petugas_kembalikan' => [
                 'type'       => 'VARCHAR',
                 'constraint' => 255,
             ],
