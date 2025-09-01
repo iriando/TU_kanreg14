@@ -18,9 +18,7 @@
 
     <div class="mb-3">
         <label for="kode_barang" class="form-label">Kode Barang</label>
-        <input type="text" name="kode_barang" id="kode_barang"
-               value="<?= old('kode_barang') ?>"
-               class="form-control <?= (session('errors.kode_barang') ? 'is-invalid' : '') ?>">
+        <input type="text" name="kode_barang" id="kode_barang"value="<?= old('kode_barang') ?>" class="form-control <?= (session('errors.kode_barang') ? 'is-invalid' : '') ?>">
         <div class="invalid-feedback">
             <?= session('errors.kode_barang') ?>
         </div>
