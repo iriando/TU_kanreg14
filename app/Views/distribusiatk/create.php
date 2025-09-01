@@ -17,6 +17,7 @@
         <?php endif; ?>
 
         <form action="<?= site_url('distribusiatk/store') ?>" method="post">
+            <?= csrf_field() ?>
             <div class="form-group">
                 <label for="kode_barang">Barang ATK</label>
                 <select name="kode_barang" class="form-control" required>

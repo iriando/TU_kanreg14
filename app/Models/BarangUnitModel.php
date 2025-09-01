@@ -54,4 +54,32 @@ class BarangUnitModel extends Model
     {
         return $this->where('kode_barang', $kode_barang)->findAll();
     }
+
+    public function getAvailableByKodeBarang($kode_barang)
+    {
+        return $this->where('kode_barang', $kode_barang)
+                    ->where('status', 'tersedia')
+                    ->findAll();
+    }
+
+    public function setDipinjam(array $ids)
+    {
+        return $this->whereIn('id', $ids)
+                    ->set(['status' => 'dipinjam'])
+                    ->update();
+    }
+
+    public function setTersedia(array $ids)
+    {
+        return $this->whereIn('id', $ids)
+                    ->set(['status' => 'tersedia'])
+                    ->update();
+    }
+
+    public function getByStatus($kodeBarang, $status)
+    {
+        return $this->where('kode_barang', $kodeBarang)
+                    ->where('status', $status)
+                    ->findAll();
+    }
 }

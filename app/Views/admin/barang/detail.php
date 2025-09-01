@@ -4,7 +4,10 @@
 <div class="card">
     <div class="card-header">
         <h3 class="card-title">Detail Barang: <?= esc($barang['nama_barang']) ?> (<?= esc($barang['kode_barang']) ?>)</h3>
-        <a href="<?= site_url('barang') ?>" class="btn btn-secondary btn-sm float-right">Kembali</a>
+        <div class="card-tools">
+            <a href="<?= site_url('barang') ?>" class="btn btn-secondary btn-sm">Kembali</a>
+            <a href="<?= site_url('barang/create-unit/'.$barang['kode_barang']) ?>" class="btn btn-sm btn-primary">Tambah Unit</a>
+        </div>
     </div>
 
     <div class="card-body">
@@ -67,9 +70,6 @@
                 <?php endif; ?>
             </tbody>
         </table>
-        <div>
-            <a href="<?= site_url('barang/create-unit/'.$barang['kode_barang']) ?>" class="btn btn-success mb-3">Tambah Unit</a>
-        </div>
     </div>
 </div>
 

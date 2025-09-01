@@ -4,161 +4,172 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use App\Models\PeminjamanModel;
-use App\Models\BarangModel;
+use App\Models\BarangMasterModel;
+use App\Models\BarangUnitModel;
 
 class Peminjaman extends BaseController
 {
     protected $peminjamanModel;
     protected $barangModel;
+    protected $unitModel;
 
     public function __construct()
     {
         $this->peminjamanModel = new PeminjamanModel();
-        $this->barangModel     = new BarangModel();
+        $this->barangModel     = new BarangMasterModel();
+        $this->unitModel       = new BarangUnitModel();
     }
 
     public function index()
     {
-        $peminjaman = $this->peminjamanModel->getAllWithBarang();
-        return view('peminjaman/index', [
-            'peminjaman' => $peminjaman
-        ]);
+        // ambil semua log peminjaman (urut terbaru dulu)
+        $peminjaman = $this->peminjamanModel->orderBy('id', 'DESC')->findAll();
+        // cache sisa per transaksi supaya tidak query berkali-kali
+        $sisaMap = [];
+        foreach ($peminjaman as $p) {
+            // pastikan kita pakai transaksi_id sebagai key; kalau belum ada pakai id sendiri
+            $transId = $p->transaksi_id ?? $p->id;
+            if (! isset($sisaMap[$transId])) {
+                // getSisaPinjam harus mengembalikan integer sisa (pinjam - kembali)
+                $sisaMap[$transId] = $this->peminjamanModel->getSisaPinjam($transId);
+            }
+            // pasang properti sisa ke tiap record supaya view bisa pakai $p->sisa
+            $p->sisa = $sisaMap[$transId];
+        }
+        return view('peminjaman/index', ['peminjaman' => $peminjaman]);
     }
 
     public function create()
     {
-        $barang = $this->barangModel->getAll();
-        return view('peminjaman/create', ['barang' => $barang]);
+        $data['barang'] = $this->barangModel->orderBy('id', 'DESC')->findAll();
+        return view('peminjaman/create', $data);
+    }
+
+    public function getBarangUnit()
+    {
+        $kode_barang = $this->request->getGet('kode_barang');
+        $units = $this->unitModel->getAvailableByKodeBarang($kode_barang);
+        return $this->response->setJSON($units);
     }
 
     public function store()
     {
-        $rules = [
-            'nama_peminjam' => 'required',
-            'kode_barang'   => 'required',
-            'jumlah'        => 'required|integer',
-            'tanggal_pinjam'=> 'required|valid_date',
-        ];
+        $namaPeminjam   = $this->request->getPost('nama_peminjam');
+        $kodeBarang     = $this->request->getPost('kode_barang');
+        $barang         = $this->barangModel->where('kode_barang', $kodeBarang)->first();
+        $unitDipilih    = $this->request->getPost('barangunit');
+        $tanggalPinjam  = $this->request->getPost('tanggal_pinjam');
+        $jumlahUnit     = count($unitDipilih);
+        $petugas        = user()->username;
 
-        if (!$this->validate($rules)) {
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        // Insert peminjaman awal
+        $id = $this->peminjamanModel->insert([
+            'nama_peminjam'   => $namaPeminjam,
+            'kode_barang'     => $kodeBarang,
+            'nama_barang'     => $barang['nama_barang'],
+            'jumlah'          => $jumlahUnit,
+            'tanggal_pinjam'  => $tanggalPinjam,
+            'petugas_pinjam'  => $petugas,
+            'status'          => 'pinjam',
+        ], true); // true supaya return insertID
+
+        // Update transaksi_id dengan id sendiri (jadi induk log)
+        $this->peminjamanModel->update($id, ['transaksi_id' => $id]);
+
+        // Update unit → jadi dipinjam
+        if (!empty($unitDipilih)) {
+            $this->unitModel->whereIn('id', $unitDipilih)
+                            ->set(['status' => 'dipinjam'])
+                            ->update();
         }
 
-        $this->peminjamanModel->createPeminjaman($this->request->getPost(), user()->username);
-        return redirect()->to('/peminjaman')->with('message', 'Peminjaman berhasil ditambahkan');
+        return redirect()->to('/peminjaman')->with('success', 'Peminjaman berhasil ditambahkan');
+    }
+
+    public function kembalikan()
+    {
+        $unitKembali  = $this->request->getPost('unit_kembali');
+        $id           = $this->request->getPost('id'); // id peminjaman induk
+        $data         = $this->peminjamanModel->find($id);
+        $jumlahUnit   = count($unitKembali);
+        $petugas      = user()->username;
+
+        if (!empty($unitKembali) && $data) {
+            // Update status unit jadi tersedia
+            $this->unitModel->setTersedia($unitKembali);
+
+            // Insert log pengembalian
+            $this->peminjamanModel->insert([
+                'transaksi_id'        => $dat->transaksi_id ?? $data->id,
+                'nama_peminjam'       => $data->nama_peminjam,
+                'kode_barang'         => $data->kode_barang,
+                'nama_barang'         => $data->nama_barang,
+                'jumlah'              => $jumlahUnit,
+                'tanggal_pinjam'      => $data->tanggal_pinjam,
+                'tanggal_kembali'     => date('Y-m-d H:i:s'),
+                'petugas_kembalikan'  => $petugas,
+                'status'              => 'dikembalikan',
+            ]);
+        }
+
+        return redirect()->to('/peminjaman')->with('success', 'Barang berhasil dikembalikan');
+    }
+
+
+    public function getUnitDipinjam()
+    {
+        $peminjamanId = $this->request->getGet('peminjaman_id');
+        $kodeBarang   = $this->request->getGet('kode_barang');
+        $units = $this->unitModel
+                    ->where('kode_barang', $kodeBarang)
+                    ->where('status', 'dipinjam')
+                    ->findAll();
+
+        return $this->response->setJSON($units);
     }
 
     public function edit($id)
     {
-        $peminjaman = $this->peminjamanModel->getById($id);
+        // ambil data peminjaman berdasarkan id
+        $peminjaman = $this->peminjamanModel->find($id);
+
         if (!$peminjaman) {
             throw new \CodeIgniter\Exceptions\PageNotFoundException('Peminjaman tidak ditemukan');
         }
 
-        $barang = $this->barangModel->getAll();
         return view('peminjaman/edit', [
+            'title'      => 'Edit Peminjaman',
             'peminjaman' => $peminjaman,
-            'barang'     => $barang
+            'barang'     => $this->barangModel->findAll(), // dropdown kode barang
         ]);
     }
 
     public function update($id)
     {
-        $rules = [
-            'nama_peminjam' => 'required',
-            'kode_barang'   => 'required',
-            'jumlah'        => 'required|integer',
-            'tanggal_pinjam'=> 'required|valid_date',
-            'status'        => 'required'
+        $peminjaman = $this->peminjamanModel->find($id);
+
+        if (!$peminjaman) {
+            throw new \CodeIgniter\Exceptions\PageNotFoundException('Peminjaman tidak ditemukan');
+        }
+
+        $kodeBarang   = $this->request->getPost('kode_barang');
+        $barang       = $this->barangModel->where('kode_barang', $kodeBarang)->first();
+
+        $data = [
+            'nama_peminjam'   => $this->request->getPost('nama_peminjam'),
+            'tanggal_pinjam'  => $this->request->getPost('tanggal_pinjam'),
         ];
 
-        if (!$this->validate($rules)) {
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
-        }
-        $this->peminjamanModel->updatePeminjaman($id, $this->request->getPost(), user()->username);
-        return redirect()->to('/peminjaman')->with('message', 'Peminjaman berhasil diupdate');
+        $this->peminjamanModel->update($id, $data);
+
+        return redirect()->to('/peminjaman')->with('success', 'Data peminjaman berhasil diperbarui');
     }
+
 
     public function delete($id)
     {
         $this->peminjamanModel->deletePeminjaman($id);
         return redirect()->to('/peminjaman')->with('message', 'Peminjaman berhasil dihapus');
-    }
-
-    public function dikembalikan($id)
-    {
-        $this->peminjamanModel->setKembali($id, user()->username);
-        return redirect()->to('/peminjaman')->with('message', 'Status peminjaman diupdate menjadi Kembali');
-    }
-
-    public function formKembali($id)
-    {
-        $peminjaman = $this->peminjamanModel->getById($id);
-        if (!$peminjaman) {
-            throw new \CodeIgniter\Exceptions\PageNotFoundException('Peminjaman tidak ditemukan');
-        }
-
-        return view('peminjaman/form_kembali', [
-            'peminjaman' => $peminjaman
-        ]);
-    }
-
-    public function prosesKembali($id)
-    {
-        $peminjaman = $this->peminjamanModel->find($id);
-        if (!$peminjaman) {
-            return redirect()->back()->with('error', 'Data peminjaman tidak ditemukan');
-        }
-
-        $barang = $this->barangModel->where('kode_barang', $peminjaman->kode_barang)->first();
-        if (!$barang) {
-            return redirect()->back()->with('error', 'Data barang tidak ditemukan');
-        }
-
-        $jumlahKembali = (int) $this->request->getPost('jumlah_kembali');
-
-        if ($jumlahKembali > $peminjaman->jumlah) {
-            return redirect()->back()->with('error', 'Jumlah kembali melebihi jumlah yang dipinjam');
-        }
-
-        $sisaPinjam = $peminjaman->jumlah - $jumlahKembali;
-
-        // update stok barang
-        $this->barangModel->update($barang['id'], [
-            'dipinjam' => $barang['dipinjam'] - $jumlahKembali,
-            'sisa'     => $barang['sisa'] + $jumlahKembali,
-        ]);
-
-        // log pengembalian (baris baru)
-        $this->peminjamanModel->insert([
-            'kode_barang'      => $peminjaman->kode_barang,
-            'nama_peminjam'    => $peminjaman->nama_peminjam,
-            'nama_barang'      => $peminjaman->nama_barang,
-            'jumlah'           => $jumlahKembali,
-            'status'           => 'Dikembalikan',
-            'tanggal_pinjam'   => $peminjaman->tanggal_pinjam,
-            'tanggal_kembali'  => date('Y-m-d H:i:s'),
-            'petugas_pinjam'   => $peminjaman->petugas_pinjam,
-            'petugas_kembalikan'=> user()->username,
-        ]);
-
-        // update sisa pinjaman
-        if ($sisaPinjam > 0) {
-            $this->peminjamanModel->update($id, [
-                'jumlah'   => $sisaPinjam,
-                'status'   => 'Dipinjam',
-                'updated_at' => date('Y-m-d H:i:s')
-            ]);
-        } else {
-            // kalau semua dikembalikan, ubah status
-            $this->peminjamanModel->update($id, [
-                'status'            => 'Dikembalikan',
-                'tanggal_kembali'   => date('Y-m-d H:i:s'),
-                'petugas_kembalikan'=> user()->username,
-            ]);
-        }
-
-        return redirect()->to('/peminjaman')->with('success', 'Pengembalian berhasil diproses');
     }
 
 }

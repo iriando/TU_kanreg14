@@ -10,18 +10,17 @@
         </div>
     </div>
     <div class="card-body table-responsive">
-        <?php if(session()->getFlashdata('error')): ?>
-            <div class="alert alert-danger"><?= session()->getFlashdata('error') ?></div>
+        <?php if(session()->getFlashdata('success')): ?>
+            <div class="alert alert-success"><?= session()->getFlashdata('success') ?></div>
         <?php endif; ?>
-        
         <table id="peminjamanTable" class="table table-bordered table-hover">
             <thead>
                 <tr>
                     <th>No</th>
                     <th>Nama Peminjam</th>
-                    <th>Nama Barang</th>
                     <th>Kode Barang</th>
-                    <th>Jumlah</th>
+                    <th>Nama Barang</th>
+                    <th>Jumlah Unit</th>
                     <th>Tanggal Pinjam</th>
                     <th>Tanggal Kembali</th>
                     <th>Dipinjamkan Oleh</th>
@@ -36,31 +35,37 @@
                         <tr>
                             <td></td> <!-- nomor akan diisi otomatis oleh datatables -->
                             <td><?= esc($p->nama_peminjam) ?></td>
-                            <td><?= esc($p->nama_barang) ?></td>
                             <td><?= esc($p->kode_barang) ?></td>
+                            <td><?= esc($p->nama_barang) ?></td>
                             <td><?= esc($p->jumlah) ?></td>
                             <td><?= esc($p->tanggal_pinjam) ?></td>
                             <td><?= $p->tanggal_kembali ?? '-' ?></td>
                             <td><?= esc($p->petugas_pinjam) ?></td>
                             <td><?= esc($p->petugas_kembalikan) ?></td>
                             <td>
-                                <?php if($p->status === 'Dipinjam'): ?>
-                                    <span class="badge badge-danger">Dipinjam</span>
+                                <?php if($p->status === 'pinjam'): ?>
+                                    <span class="badge badge-danger">Pinjam</span>
                                 <?php else: ?>
-                                    <span class="badge badge-success">Kembali</span>
+                                    <span class="badge badge-success">Dikembalikan</span>
                                 <?php endif; ?>
                             </td>
                             <td>
-                                <?php if (in_groups('admin')): ?>
-                                    <a href="<?= site_url('peminjaman/edit/'.$p->id) ?>" class="btn btn-warning btn-sm">Edit</a>
-                                    <a href="<?= site_url('peminjaman/delete/'.$p->id) ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin hapus?')">Hapus</a>
-                                <?php endif; ?>
-
-                                <?php if($p->status === 'Dipinjam'): ?>
-                                    <button class="btn btn-success btn-sm" onclick="kembalikan(<?= $p->id ?>)">
-                                        Kembalikan
-                                    </button>
-                                <?php endif; ?>
+                                <div class="btn-group" role="group">
+                                    <?php if (in_groups('admin')): ?>
+                                        <a href="<?= site_url('peminjaman/edit/'.$p->id) ?>" class="btn btn-warning btn-sm">Edit</a>
+                                        <a href="<?= site_url('peminjaman/delete/'.$p->id) ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin hapus?')">Hapus</a>
+                                    <?php endif; ?>
+                                    <?php if (!empty($p->sisa) && $p->status === 'pinjam'): ?>
+                                        <a href="#" 
+                                        class="btn btn-sm btn-success btn-kembalikan"
+                                        data-toggle="modal"
+                                        data-target="#modalKembalikan"
+                                        data-id="<?= $p->id ?>"
+                                        data-kode="<?= esc($p->kode_barang) ?>">
+                                        Kembalikan (<?= $p->sisa ?>)
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -71,75 +76,84 @@
                 <?php endif; ?>
             </tbody>
         </table>
-
-        <!-- Modal Pengembalian -->
-        <div class="modal fade" id="modalKembalikan" tabindex="-1">
-            <div class="modal-dialog">
-                <form id="formKembalikan" method="post">
-                    <?= csrf_field() ?>
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Pengembalian Barang</h5>
-                            <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="form-group">
-                                <label>Jumlah yang dikembalikan</label>
-                                <input type="number" name="jumlah_kembali" class="form-control" min="1" required>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                            <button type="submit" class="btn btn-primary">Simpan</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-
     </div>
 </div>
 
-<!-- Script DataTables + Modal -->
-<script>
-function kembalikan(id) {
-    let url = "<?= site_url('peminjaman/prosesKembali') ?>/" + id;
-    $('#formKembalikan').attr('action', url);
-    $('#modalKembalikan').modal('show');
-}
+<div class="modal fade" id="modalKembalikan" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+        <form action="<?= site_url('peminjaman/kembalikan') ?>" method="post">
+            <?= csrf_field() ?>
+            <div class="modal-header">
+            <h5 class="modal-title">Kembalikan Barang</h5>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+            <input type="hidden" name="id" id="id">
+            <input type="hidden" name="kode_barang" id="kode_barang">
 
-$(function () {
-    var t = $('#peminjamanTable').DataTable({
+            <div class="form-group">
+                <label for="unitKembali">Pilih Unit yang Dikembalikan</label>
+                <select name="unit_kembali[]" id="unitKembali" style="width: 100%;" class="select2 form-control" multiple="multiple" required>
+                <!-- opsi diisi via AJAX -->
+                </select>
+            </div>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+            <button type="submit" class="btn btn-primary">Simpan Pengembalian</button>
+            </div>
+        </form>
+        </div>
+    </div>
+</div>
+
+<?= $this->endSection() ?>
+
+<?= $this->section('scripts') ?>
+<script>
+$(document).ready(function () {
+    let table = $('#peminjamanTable').DataTable({
         responsive: true,
-        autoWidth: false,
-        pageLength: 10,
-        dom: 'Bfrtip',
-        buttons: [
-            { extend: 'copy', text: 'Salin' },
-            { extend: 'excel', text: 'Excel' },
-            { extend: 'csv', text: 'CSV' },
-            { extend: 'pdf', text: 'PDF' },
-            { extend: 'print', text: 'Cetak' },
-        ],
-        columnDefs: [{
-            searchable: false,
-            orderable: false,
-            targets: 0
-        }],
-        order: [[1, 'asc']],
-        language: {
-            url: "<?= base_url('adminlte/plugins/datatables/i18n/Indonesian.json') ?>"
-        }
+        ordering: true,
+        columnDefs: [
+            { orderable: false, targets: [0, -1] } // kolom nomor & aksi tidak bisa diurutkan
+        ]
     });
 
-    // isi nomor otomatis setiap kali table redraw
-    t.on('order.dt search.dt draw.dt', function () {
+    table.on('order.dt search.dt draw.dt', function () {
         let i = 1;
-        t.cells(null, 0, { search: 'applied', order: 'applied' }).every(function () {
-            this.data(i++);
+        table.column(0, { search: 'applied', order: 'applied' })
+                .nodes()
+                .each(function (cell) {
+                    cell.innerHTML = i++;
         });
     }).draw();
 });
-</script>
 
+$(document).on('click', '.btn-kembalikan', function () {
+    let id   = $(this).data('id');
+    let kode = $(this).data('kode');
+    $('.select2').select2();
+    $('#id').val(id);
+    $('#kode_barang').val(kode);
+
+    // Kosongkan select
+    $('#unitKembali').empty();
+
+    // Ambil unit yang sedang dipinjam
+    $.get('<?= site_url("peminjaman/getUnitDipinjam") ?>', { id: id, kode_barang: kode }, function (data) {
+        if (data.length > 0) {
+            data.forEach(function (item) {
+                $('#unitKembali').append(
+                    `<option value="${item.id}">${item.merk} (${item.kode_unit})</option>`
+                );
+            });
+        } else {
+            $('#unitKembali').append(`<option disabled>Tidak ada unit yang sedang dipinjam</option>`);
+        }
+    }, 'json');
+});
+</script>
 <?= $this->endSection() ?>
+

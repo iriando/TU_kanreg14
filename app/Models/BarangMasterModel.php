@@ -88,9 +88,13 @@ class BarangMasterModel extends Model
 
     public function getWithUnits()
     {
-        return $this->select('barang_master.*, COUNT(barang_unit.kode_unit) as total_unit')
-                    ->join('barang_unit', 'barang_unit.kode_barang = barang_master.kode_barang', 'left')
-                    ->groupBy('barang_master.kode_barang')
-                    ->findAll();
+        return $this->select("
+                barang_master.*,
+                COUNT(barang_unit.kode_unit) as total_unit,
+                SUM(CASE WHEN barang_unit.status = 'dipinjam' THEN 1 ELSE 0 END) as total_dipinjam
+            ")
+            ->join('barang_unit', 'barang_unit.kode_barang = barang_master.kode_barang', 'left')
+            ->groupBy('barang_master.kode_barang')
+            ->findAll();
     }
 }

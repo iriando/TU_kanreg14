@@ -39,8 +39,10 @@ $routes->group('usermanager', [
 $routes->group('peminjaman', ['namespace' => 'App\Controllers'], function($routes) {
     $routes->get('/', 'Peminjaman::index');
     $routes->get('create', 'Peminjaman::create');
+    $routes->get('getBarangUnit', 'Peminjaman::getBarangUnit');
+    $routes->get('getUnitDipinjam', 'Peminjaman::getUnitDipinjam');// route untuk ajax
     $routes->post('store', 'Peminjaman::store');
-    $routes->post('prosesKembali/(:num)', 'Peminjaman::prosesKembali/$1');
+    $routes->post('kembalikan', 'Peminjaman::kembalikan');
     $routes->group('', ['filter' => 'role:admin'], function($routes) {
         $routes->get('edit/(:num)', 'Peminjaman::edit/$1');
         $routes->post('update/(:num)', 'Peminjaman::update/$1');

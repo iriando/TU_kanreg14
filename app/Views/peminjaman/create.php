@@ -17,38 +17,32 @@
         <?php endif; ?>
 
         <form action="<?= site_url('peminjaman/store') ?>" method="post">
+            <?= csrf_field() ?>
             <div class="form-group">
                 <div class="form-group">
                     <label for="nama_peminjam">Peminjam</label>
                     <input type="text" name="nama_peminjam" class="form-control" value="<?= old('nama_peminjam') ?>" required>
                 </div>
-                <!-- <label for="user_id">Peminjam</label> -->
-                <!-- <select name="user_id" class="form-control" required> -->
-                    <!-- <option value="">-- Pilih Peminjam --</option> -->
-                    <!-- <?php //foreach($users as $u): ?> -->
-                        <!-- <option value="<//?= $u->id ?>"><//?= $u->username ?></option> -->
-                    <!-- <?php //endforeach; ?> -->
-                <!-- </select> -->
             </div>
             <div class="form-group">
                 <label for="kode_barang">Barang</label>
-                <select name="kode_barang" class="form-control" required>
+                <select name="kode_barang" id="kode_barang" class="form-control" required>
                     <option value="">-- Pilih Barang --</option>
                     <?php foreach($barang as $b): ?>
-                        <option value="<?= $b['kode_barang'] ?>" <?= old('kode_barang') == $b['kode_barang'] ? 'selected' : '' ?>>
-                            <?= $b['nama_barang'] ?> (<?= $b['kode_barang'] ?>) - Sisa: <?= $b['sisa'] ?>
-                        </option>
+                        <option value="<?= $b['kode_barang'] ?>"><?= $b['nama_barang'] ?> (<?= $b['kode_barang'] ?>)</option>
                     <?php endforeach; ?>
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="jumlah">Jumlah</label>
-                <input type="number" name="jumlah" class="form-control" value="<?= old('jumlah', 1) ?>" required>
+                <label for="barangunit">Barang Unit</label>
+                <select name="barangunit[]" id="barang_unit" style="width: 100%;" class="select2 form-control" multiple="multiple" data-placeholder="Pilih Unit" required>
+                </select>
             </div>
+
             <div class="form-group">
                 <label for="tanggal_pinjam">Tanggal Pinjam</label>
-                <input type="date" name="tanggal_pinjam" class="form-control" value="<?= old('tanggal_pinjam', date('Y-m-d')) ?>" required>
+                <input type="date" name="tanggal_pinjam" class="form-control" value="<?= old('tanggal_pinjam', date('Y-m-d H:i:s')) ?>" required>
             </div>
             <div class="form-group">
                 <label for="tanggal_kembali">Tanggal Kembali</label>
@@ -61,3 +55,39 @@
 </div>
 
 <?= $this->endSection() ?>
+
+<?= $this->section('scripts') ?>
+<script>
+        $(function () {
+        $('.select2').select2();
+        // event saat barang dipilih
+        $('#kode_barang').on('change', function () {
+            let kode_barang = $(this).val();
+            console.log("Barang dipilih:", kode_barang);
+
+            if (kode_barang) {
+                $.ajax({
+                    url: '/peminjaman/getBarangUnit',
+                    type: 'GET',
+                    data: { kode_barang: kode_barang },
+                    dataType: 'json',
+                    success: function (data) {
+                        let $barangUnit = $("#barang_unit");
+                        $barangUnit.empty(); // hapus option lama
+                        $.each(data, function (index, item) {
+                            // sesuaikan nama field dengan JSON
+                            $barangUnit.append(
+                                `<option value="${item.id}">${item.merk} (${item.kode_unit})</option>`
+                            );
+                        });
+                        // refresh select2 biar dropdown update
+                        $barangUnit.trigger('change.select2');
+                    }
+                });
+            }
+        });
+    });
+</script>
+<?= $this->endSection() ?>
+
+

@@ -13,6 +13,7 @@ class PeminjamanModel extends Model
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
+        'transaksi_id',
         'nama_peminjam',
         'nama_barang',
         'kode_barang',
@@ -22,8 +23,6 @@ class PeminjamanModel extends Model
         'status',
         'petugas_pinjam',
         'petugas_kembalikan',
-        'created_at',
-        'updated_at'
     ];
 
     protected bool $allowEmptyInserts = false;
@@ -33,7 +32,7 @@ class PeminjamanModel extends Model
     protected array $castHandlers = [];
 
     // Dates
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
@@ -56,57 +55,9 @@ class PeminjamanModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getAllWithBarang()
-    {
-        return $this->select('log_peminjaman.*, bmn.nama_barang')
-            ->join('barang bmn', 'bmn.kode_barang = log_peminjaman.kode_barang', 'left')
-            ->orderBy('log_peminjaman.id', 'ASC')
-            ->findAll();
-    }
-
     public function getById($id)
     {
         return $this->where('id', $id)->first();
-    }
-
-    public function createPeminjaman($data, $petugas)
-    {
-        $barangModel = new BarangModel();
-        $barang      = $barangModel->getByKode($data['kode_barang']);
-
-        $this->insert([
-            'nama_peminjam'  => $data['nama_peminjam'],
-            'nama_barang'    => $barang['nama_barang'],
-            'kode_barang'    => $data['kode_barang'],
-            'jumlah'         => $data['jumlah'],
-            'tanggal_pinjam' => $data['tanggal_pinjam'],
-            'tanggal_kembali'=> $data['tanggal_kembali'] ?? null,
-            'status'         => 'Dipinjam',
-            'petugas_pinjam' => $petugas,
-            'created_at'     => date('Y-m-d H:i:s')
-        ]);
-
-        $this->updateBarangStock($data['kode_barang']);
-    }
-
-    public function updatePeminjaman($id, $data, $petugas)
-    {
-        $barangModel = new BarangModel();
-        $barang      = $barangModel->getByKode($data['kode_barang']);
-
-        $this->update($id, [
-            'nama_peminjam'  => $data['nama_peminjam'],
-            'nama_barang'    => $barang['nama_barang'],
-            'kode_barang'    => $data['kode_barang'],
-            'jumlah'         => $data['jumlah'],
-            'tanggal_pinjam' => $data['tanggal_pinjam'],
-            'tanggal_kembali'=> $data['tanggal_kembali'],
-            'status'         => $data['status'],
-            'petugas'        => $petugas,
-            'updated_at'     => date('Y-m-d H:i:s')
-        ]);
-
-        $this->updateBarangStock($data['kode_barang']);
     }
 
     public function deletePeminjaman($id)
@@ -114,39 +65,36 @@ class PeminjamanModel extends Model
         $peminjaman = $this->getById($id);
         if ($peminjaman) {
             $this->delete($id);
-            $this->updateBarangStock($peminjaman->kode_barang);
         }
     }
 
-    public function setKembali($id, $petugas)
+    public function getTotalPinjam($transaksiId)
     {
-        $peminjaman = $this->getById($id);
-        if ($peminjaman && $peminjaman->status !== 'Kembali') {
-            $this->update($id, [
-                'status'          => 'Kembali',
-                'tanggal_kembali' => date('Y-m-d'),
-                'petugas'         => $petugas,
-                'updated_at'      => date('Y-m-d H:i:s')
-            ]);
-            $this->updateBarangStock($peminjaman->kode_barang);
-        }
+        return (int) $this->where('transaksi_id', $transaksiId)
+                         ->where('status', 'pinjam')
+                         ->selectSum('jumlah')
+                         ->get()
+                         ->getRow()
+                         ->jumlah ?? 0;
     }
 
-    private function updateBarangStock($kode_barang)
+    // Hitung total dikembalikan
+    public function getTotalKembali($transaksiId)
     {
-        $barangModel = new BarangModel();
-        $barang      = $barangModel->getByKode($kode_barang);
-        if (!$barang) return;
+        return (int) $this->where('transaksi_id', $transaksiId)
+                         ->where('status', 'dikembalikan')
+                         ->selectSum('jumlah')
+                         ->get()
+                         ->getRow()
+                         ->jumlah ?? 0;
+    }
 
-        $dipinjam = $this->selectSum('jumlah')
-            ->where('kode_barang', $kode_barang)
-            ->where('status', 'Dipinjam')
-            ->get()->getRow()->jumlah ?? 0;
+    // Hitung sisa yang masih dipinjam
+    public function getSisaPinjam($transaksiId)
+    {
+        $totalPinjam  = $this->getTotalPinjam($transaksiId);
+        $totalKembali = $this->getTotalKembali($transaksiId);
 
-        $barangModel->updateByKode($kode_barang, [
-            'dipinjam'   => $dipinjam,
-            'sisa'       => $barang['jumlah'] - $dipinjam,
-            'updated_at' => date('Y-m-d H:i:s')
-        ]);
+        return $totalPinjam - $totalKembali;
     }
 }
