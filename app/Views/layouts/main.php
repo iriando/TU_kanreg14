@@ -11,7 +11,8 @@
   <link rel="stylesheet" href="<?= base_url('adminlte/plugins/datatables-buttons/css/buttons.bootstrap4.min.css') ?>">
   <!-- Select2 -->
   <link rel="stylesheet" href="<?= base_url('adminlte/plugins/select2/css/select2.min.css') ?>">
-
+  <!-- toastr -->
+  <link rel="stylesheet" href="<?= base_url('adminlte/plugins/toastr/toastr.min.css') ?>">
   <!-- Font Awesome -->
   <link rel="stylesheet" href="<?= base_url('adminlte/plugins/fontawesome-free/css/all.min.css') ?>">
 </head>
@@ -53,6 +54,7 @@
 <script src="<?= base_url('adminlte/plugins/datatables-buttons/js/buttons.print.min.js') ?>"></script>
 <script src="<?= base_url('adminlte/plugins/datatables-buttons/js/buttons.colVis.min.js') ?>"></script>
 <script src="<?= base_url('adminlte/plugins/select2/js/select2.full.min.js') ?>"></script>
+<script src="<?= base_url('adminlte/plugins/toastr/toastr.min.js') ?>"></script>
 
 <?= $this->renderSection('scripts') ?>
 

@@ -17,6 +17,7 @@
         <?php endif; ?>
 
         <form action="<?= site_url('obat/update/'.$obat->id) ?>" method="post">
+            <?= csrf_field() ?>
             <div class="form-group">
                 <label for="kode_barang">Kode Barang</label>
                 <input type="text" name="kode_barang" class="form-control" value="<?= old('kode_barang', $obat->kode_barang) ?>" required>
@@ -32,6 +33,10 @@
             <div class="form-group">
                 <label for="jumlah">Jumlah</label>
                 <input type="number" name="jumlah" class="form-control" value="<?= old('jumlah', $obat->jumlah) ?>" required>
+            </div>
+            <div class="form-group">
+                <label for="kedaluwarsa">Tanggal kedaluwarsa</label>
+                <input type="date" name="kedaluwarsa" class="form-control" value="<?= old('kedaluwarsa') ?>" required>
             </div>
             <button type="submit" class="btn btn-primary">Update</button>
             <a href="<?= site_url('obat') ?>" class="btn btn-secondary">Batal</a>

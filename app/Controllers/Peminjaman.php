@@ -169,7 +169,7 @@ class Peminjaman extends BaseController
     public function delete($id)
     {
         $this->peminjamanModel->deletePeminjaman($id);
-        return redirect()->to('/peminjaman')->with('message', 'Peminjaman berhasil dihapus');
+        return redirect()->to('/peminjaman')->with('success', 'Peminjaman berhasil dihapus');
     }
 
 }

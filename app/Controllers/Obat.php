@@ -33,6 +33,7 @@ class Obat extends BaseController
             'nama_barang' => 'required',
             'satuan'    => 'required',
             'jumlah'      => 'required|integer',
+            'kedaluwarsa'      => 'required|date',
         ];
 
         if (!$this->validate($rules)) {
@@ -44,6 +45,7 @@ class Obat extends BaseController
             'nama_barang' => $this->request->getPost('nama_barang'),
             'satuan'    => $this->request->getPost('satuan'),
             'jumlah'      => $this->request->getPost('jumlah'),
+            'kedaluwarsa'      => $this->request->getPost('kedaluwarsa'),
             'didistribusi'    => 0,
             'sisa'        => $this->request->getPost('jumlah'),
         ]);
@@ -70,6 +72,7 @@ class Obat extends BaseController
             'nama_barang' => 'required',
             'satuan'      => 'required',
             'jumlah'      => 'required|integer',
+            'kedaluwarsa' => 'required|date',
         ]);
 
         if (!$this->obatModel->save($data)) {

@@ -10,9 +10,6 @@
         </div>
     </div>
     <div class="card-body table-responsive">
-        <?php if(session()->getFlashdata('success')): ?>
-            <div class="alert alert-success"><?= session()->getFlashdata('success') ?></div>
-        <?php endif; ?>
         <table id="peminjamanTable" class="table table-bordered table-hover">
             <thead>
                 <tr>
@@ -155,6 +152,23 @@ $(document).on('click', '.btn-kembalikan', function () {
         }
     }, 'json');
 });
+
+<?php if (session()->getFlashdata('success')): ?>
+    toastr.success("<?= session()->getFlashdata('success') ?>");
+<?php endif; ?>
+
+<?php if (session()->getFlashdata('error')): ?>
+    toastr.error("<?= session()->getFlashdata('error') ?>");
+<?php endif; ?>
+
+<?php if (session()->getFlashdata('warning')): ?>
+    toastr.warning("<?= session()->getFlashdata('warning') ?>");
+<?php endif; ?>
+
+<?php if (session()->getFlashdata('info')): ?>
+    toastr.info("<?= session()->getFlashdata('info') ?>");
+<?php endif; ?>
+
 </script>
 <?= $this->endSection() ?>
 

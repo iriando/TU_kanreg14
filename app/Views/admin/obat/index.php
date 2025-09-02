@@ -28,6 +28,7 @@
                     <th>Jumlah</th>
                     <th>Didistribusi</th>
                     <th>Sisa</th>
+                    <th>Tanggal kedaluwarsa</th>
                     <?php if (in_groups('admin')): ?>
                     <th>Aksi</th>
                     <?php endif; ?>
@@ -43,6 +44,7 @@
                     <td><?= $o->jumlah ?></td>
                     <td><?= $o->didistribusi ?></td>
                     <td><?= $o->sisa ?></td>
+                    <td><?= $o->kedaluwarsa ?></td>
                     <?php if (in_groups('admin')): ?>
                     <td>
                         <a href="<?= site_url('obat/edit/'.$o->id) ?>" class="btn btn-warning btn-sm">Edit</a>

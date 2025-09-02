@@ -173,8 +173,6 @@ class Barang extends Controller
         return redirect()->back()->withInput()->with('error', 'Gagal memperbarui unit.');
     }
 
-
-    // Hapus Unit
     public function deleteUnit($id)
     {
         $unit = $this->barangUnit->find($id);

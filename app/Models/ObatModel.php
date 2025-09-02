@@ -19,6 +19,7 @@ class ObatModel extends Model
         'jumlah',
         'didistribusi',
         'sisa',
+        'kedaluwarsa',
     ];
 
     protected bool $allowEmptyInserts = false;
@@ -40,6 +41,7 @@ class ObatModel extends Model
         'nama_barang' => 'required',
         'satuan'      => 'required',
         'jumlah'      => 'required|integer',
+        'kedaluwarsa'      => 'required',
     ];
     protected $validationMessages   = [
         'kode_barang' => [
@@ -55,6 +57,9 @@ class ObatModel extends Model
         'jumlah' => [
             'required' => 'Jumlah wajib diisi.',
             'integer'  => 'Jumlah harus berupa angka.'
+        ],
+        'kedaluwarsa' => [
+            'required' => 'Tanggal kedaluwarsa wajib diisi.'
         ]
     ];
     protected $skipValidation       = false;
