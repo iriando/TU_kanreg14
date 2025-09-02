@@ -116,6 +116,7 @@ $(document).ready(function () {
     let table = $('#peminjamanTable').DataTable({
         responsive: true,
         ordering: true,
+        scrollX: true,
         columnDefs: [
             { orderable: false, targets: [0, -1] } // kolom nomor & aksi tidak bisa diurutkan
         ]
