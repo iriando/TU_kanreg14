@@ -43,6 +43,8 @@ $routes->group('peminjaman', ['namespace' => 'App\Controllers'], function($route
     $routes->get('getUnitDipinjam', 'Peminjaman::getUnitDipinjam');// route untuk ajax
     $routes->post('store', 'Peminjaman::store');
     $routes->post('kembalikan', 'Peminjaman::kembalikan');
+    $routes->get('bast/(:num)', 'Peminjaman::bast/$1');
+    $routes->post('prosesBast/(:num)', 'Peminjaman::prosesBast/$1');
     $routes->group('', ['filter' => 'role:admin'], function($routes) {
         $routes->get('edit/(:num)', 'Peminjaman::edit/$1');
         $routes->post('update/(:num)', 'Peminjaman::update/$1');

@@ -51,6 +51,12 @@
             <p>User Manager</p>
           </a>
         </li>
+        <li class="nav-item">
+          <a href="<?= site_url('template') ?>" class="nav-link">
+            <i class="nav-icon fas fa-file"></i>
+            <p>Template Manager</p>
+          </a>
+        </li>
         <?php endif; ?>
 
       </ul>

@@ -61,6 +61,7 @@
                                         data-kode="<?= esc($p->kode_barang) ?>">
                                         Kembalikan (<?= $p->sisa ?>)
                                         </a>
+                                        <a href="<?= site_url('peminjaman/bast/'.$p->id) ?>" class="btn btn-info btn-sm">Buat BAST</a>
                                     <?php endif; ?>
                                 </div>
                             </td>

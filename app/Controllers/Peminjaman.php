@@ -2,10 +2,11 @@
 
 namespace App\Controllers;
 
-use App\Controllers\BaseController;
+use App\Models\BarangUnitModel;
 use App\Models\PeminjamanModel;
 use App\Models\BarangMasterModel;
-use App\Models\BarangUnitModel;
+use App\Controllers\BaseController;
+use PhpOffice\PhpWord\TemplateProcessor;
 
 class Peminjaman extends BaseController
 {
@@ -130,7 +131,6 @@ class Peminjaman extends BaseController
 
     public function edit($id)
     {
-        // ambil data peminjaman berdasarkan id
         $peminjaman = $this->peminjamanModel->find($id);
 
         if (!$peminjaman) {
@@ -171,5 +171,78 @@ class Peminjaman extends BaseController
         $this->peminjamanModel->deletePeminjaman($id);
         return redirect()->to('/peminjaman')->with('success', 'Peminjaman berhasil dihapus');
     }
+
+    public function bast($id)
+    {
+        $peminjaman = $this->peminjamanModel->find($id);
+
+        if (!$peminjaman) {
+            throw new \CodeIgniter\Exceptions\PageNotFoundException('Peminjaman tidak ditemukan');
+        }
+
+        return view('peminjaman/create_bast', [
+            'title'      => 'Buat Berita Acara Serah Terima',
+            'peminjaman' => $peminjaman,
+        ]);
+    }
+
+    public function prosesBast($id = null)
+    {
+        $peminjaman = $this->peminjamanModel->find($id);
+        if (!$peminjaman) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        }
+
+        $unitModel = new BarangUnitModel();
+        $masterModel = new BarangMasterModel();
+
+        // ambil data master barang
+        $barangMaster = $masterModel->where('kode_barang', $peminjaman->kode_barang)->first();
+
+        // ambil unit barang yg sedang dipinjam
+        $barangDipinjam = $unitModel->where('kode_barang', $peminjaman->kode_barang)
+            ->where('status', 'dipinjam')
+            ->findAll();
+
+        $templateProcessor = new TemplateProcessor(WRITEPATH . '../app/Templates/BAST-template.docx');
+
+        // isi placeholder utama (contoh, silakan sesuaikan)
+        $templateProcessor->setValue('nomor', $this->request->getPost('nomor'));
+        $templateProcessor->setValue('tanggal', date('d-m-Y', strtotime($this->request->getPost('tanggal'))));
+        $templateProcessor->setValue('peminjam_nama', $this->request->getPost('peminjam_nama'));
+        $templateProcessor->setValue('peminjam_nip', $this->request->getPost('peminjam_nip'));
+        $templateProcessor->setValue('peminjam_pangkat', $this->request->getPost('peminjam_pangkat'));
+        $templateProcessor->setValue('peminjam_jabatan', $this->request->getPost('peminjam_jabatan'));
+        $templateProcessor->setValue('peminjam_unker', $this->request->getPost('peminjam_unker'));
+        $templateProcessor->setValue('petugas_nama', $this->request->getPost('petugas_nama'));
+        $templateProcessor->setValue('petugas_nip', $this->request->getPost('petugas_nip'));
+        $templateProcessor->setValue('petugas_pangkat', $this->request->getPost('petugas_pangkat'));
+        $templateProcessor->setValue('petugas_jabatan', $this->request->getPost('petugas_jabatan'));
+        $templateProcessor->setValue('petugas_unker', $this->request->getPost('petugas_unker'));
+
+        // isi tabel barang dipinjam
+        if (!empty($barangDipinjam)) {
+            $templateProcessor->cloneRow('no', count($barangDipinjam));
+
+            foreach ($barangDipinjam as $i => $unit) {
+                $row = $i + 1;
+                $templateProcessor->setValue("no#{$row}", $row);
+                $templateProcessor->setValue("nama_barang#{$row}", $barangMaster['nama_barang']);
+                $templateProcessor->setValue("kode_unit#{$row}", $unit['kode_unit']);
+                $templateProcessor->setValue("merk_unit#{$row}", $unit['merk'] ?? '-');
+                $templateProcessor->setValue("kondisi_unit#{$row}", $unit['kondisi'] ?? '-');
+            }
+        }
+
+        $filename = 'BAST_' . $peminjaman->id. '.docx';
+
+        // output ke browser
+        header("Content-Description: File Transfer");
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+        $templateProcessor->saveAs("php://output");
+        exit;
+    }
+
 
 }
