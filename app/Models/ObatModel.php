@@ -25,9 +25,6 @@ class ObatModel extends Model
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
 
-    protected array $casts = [];
-    protected array $castHandlers = [];
-
     // Dates
     protected $useTimestamps = false;
     protected $dateFormat    = 'datetime';
@@ -35,15 +32,15 @@ class ObatModel extends Model
     protected $updatedField  = 'updated_at';
     protected $deletedField  = 'deleted_at';
 
-    // Validation
-    protected $validationRules      = [
-        'kode_barang' => 'required|is_unique[obat.kode_barang]',
+    // Validation (default tanpa is_unique)
+    protected $validationRules = [
+        'kode_barang' => 'required',
         'nama_barang' => 'required',
         'satuan'      => 'required',
         'jumlah'      => 'required|integer',
-        'kedaluwarsa'      => 'required',
+        'kedaluwarsa' => 'required',
     ];
-    protected $validationMessages   = [
+    protected $validationMessages = [
         'kode_barang' => [
             'required'  => 'Kode barang wajib diisi.',
             'is_unique' => 'Kode barang sudah digunakan.'
@@ -62,20 +59,18 @@ class ObatModel extends Model
             'required' => 'Tanggal kedaluwarsa wajib diisi.'
         ]
     ];
-    protected $skipValidation       = false;
-    protected $cleanValidationRules = true;
 
-    // Callbacks
-    protected $allowCallbacks = true;
-    protected $beforeInsert   = [];
-    protected $afterInsert    = [];
-    protected $beforeUpdate   = [];
-    protected $afterUpdate    = [];
-    protected $beforeFind     = [];
-    protected $afterFind      = [];
-    protected $beforeDelete   = [];
-    protected $afterDelete    = [];
-
+    public function getValidationRules(array $data = []): array
+    {
+        return [
+            'kode_barang' => 'required',
+            'nama_barang' => 'required',
+            'satuan'      => 'required',
+            'jumlah'      => 'required|integer',
+            'kedaluwarsa' => 'required|valid_date[Y-m-d]',
+        ];
+    }
+    // --- Custom function ---
     public function getAll()
     {
         return $this->findAll();

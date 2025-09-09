@@ -41,12 +41,12 @@
             </div>
 
             <div class="form-group">
-                <label for="tanggal_pinjam">Tanggal Pinjam</label>
-                <input type="date" name="tanggal_pinjam" class="form-control" value="<?= old('tanggal_pinjam', date('Y-m-d H:i:s')) ?>" required>
-            </div>
-            <div class="form-group">
-                <label for="tanggal_kembali">Tanggal Kembali</label>
-                <input type="date" name="tanggal_kembali" class="form-control" value="<?= old('tanggal_kembali') ?>">
+                <label for="tanggal_pinjam">Tanggal & Jam Pinjam</label>
+                <input type="datetime-local" 
+                    name="tanggal_pinjam" 
+                    class="form-control" 
+                    value="<?= old('tanggal_pinjam', date('Y-m-d\TH:i')) ?>" 
+                    required>
             </div>
             <button type="submit" class="btn btn-primary">Simpan</button>
             <a href="<?= site_url('peminjaman') ?>" class="btn btn-secondary">Batal</a>

@@ -29,7 +29,7 @@
             <tbody>
                 <?php if (!empty($peminjaman)): ?>
                     <?php foreach($peminjaman as $p): ?>
-                        <tr>
+                        <tr class="<?= $p->status === 'pinjam' ? 'table-danger' : '' ?>">
                             <td></td> <!-- nomor akan diisi otomatis oleh datatables -->
                             <td><?= esc($p->nama_peminjam) ?></td>
                             <td><?= esc($p->kode_barang) ?></td>
@@ -96,6 +96,10 @@
                 <!-- opsi diisi via AJAX -->
                 </select>
             </div>
+            <div class="form-group">
+                <label for="tanggal_kembali">Tanggal dikembalikan</label>
+                <input type="datetime-local" name="tanggal_kembali" id="tanggal_kembali" class="form-control" required>
+            </div>
             </div>
             <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
@@ -115,6 +119,62 @@ $(document).ready(function () {
         responsive: true,
         ordering: true,
         scrollX: true,
+        dom: 'Bfrtip',
+        buttons: [
+            {
+                extend: 'colvis',
+                text: '<i class="fas fa-eye"></i> Colvis',
+            },
+            {
+                extend: 'excel',
+                text: '<i class="fas fa-file-excel"></i> Excel',
+                className: 'btn btn-success btn-sm',
+                exportOptions: {
+                    columns: ':visible',
+                    format: {
+                        body: function (data, row, column, node) {
+                            // Kolom No ada di index 0
+                            if (column === 0) {
+                                return row + 1; // isi manual nomor urut
+                            }
+                            return data;
+                        }
+                    }
+                }
+            },
+            {
+                extend: 'pdf',
+                text: '<i class="fas fa-file-pdf"></i> PDF',
+                className: 'btn btn-danger btn-sm',
+                exportOptions: {
+                    columns: ':visible',
+                    format: {
+                        body: function (data, row, column, node) {
+                            if (column === 0) {
+                                return row + 1;
+                            }
+                            return data;
+                        }
+                    }
+                }
+            },
+            {
+                extend: 'print',
+                text: '<i class="fas fa-print"></i> Print',
+                className: 'btn btn-info btn-sm',
+                exportOptions: {
+                    columns: ':visible',
+                    format: {
+                        body: function (data, row, column, node) {
+                            if (column === 0) {
+                                return row + 1;
+                            }
+                            return data;
+                        }
+                    }
+                }
+            }
+        ],
         columnDefs: [
             { orderable: false, targets: [0, -1] } // kolom nomor & aksi tidak bisa diurutkan
         ]
@@ -139,6 +199,10 @@ $(document).on('click', '.btn-kembalikan', function () {
 
     // Kosongkan select
     $('#unitKembali').empty();
+
+    let now = new Date();
+    let formatted = now.toISOString().slice(0,16);
+    $('#tanggal_kembali').val(formatted);
 
     // Ambil unit yang sedang dipinjam
     $.get('<?= site_url("peminjaman/getUnitDipinjam") ?>', { id: id, kode_barang: kode }, function (data) {

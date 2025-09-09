@@ -37,7 +37,7 @@ class DistribusiObatModel extends Model
 
     // Validation
     protected $validationRules = [
-        'nama_penerima'     => 'required|min_length[3]|max_length[255]',
+        'nama_penerima'     => 'required|min_length[1]|max_length[255]',
         'kode_barang'       => 'required|max_length[50]',
         'nama_barang'       => 'required|max_length[255]',
         'jumlah'            => 'required|integer|greater_than[0]',

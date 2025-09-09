@@ -14,10 +14,10 @@
             <div class="alert alert-success"><?= session()->getFlashdata('message') ?></div>
         <?php endif; ?>
 
-        <table class="table table-bordered table-hover">
+        <table class="table table-bordered table-hover" id="distribusi-atk">
             <thead>
                 <tr>
-                    <th>ID</th>
+                    <th>No</th>
                     <th>Nama Penerima</th>
                     <th>Nama Barang</th>
                     <th>Kode Barang</th>
@@ -32,7 +32,7 @@
             <tbody>
                 <?php foreach($distribusi as $d): ?>
                     <tr>
-                        <td><?= $d->id ?></td>
+                        <td></td>
                         <td><?= $d->nama_penerima ?></td>
                         <td><?= $d->nama_barang ?></td>
                         <td><?= $d->kode_barang ?></td>
@@ -41,8 +41,10 @@
                         <td><?= $d->petugas ?></td>
                         <?php if (in_groups('admin')): ?>
                         <td>
-                            <a href="<?= site_url('distribusiatk/edit/'.$d->id) ?>" class="btn btn-warning btn-sm">Edit</a>
-                            <a href="<?= site_url('distribusiatk/delete/'.$d->id) ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin hapus?')">Hapus</a>
+                            <div class="btn-group" role="group">
+                                <a href="<?= site_url('distribusiatk/edit/'.$d->id) ?>" class="btn btn-warning btn-sm">Edit</a>
+                                <a href="<?= site_url('distribusiatk/delete/'.$d->id) ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin hapus?')">Hapus</a>
+                            </div>
                         </td>
                         <?php endif; ?>
                     </tr>
@@ -52,4 +54,106 @@
     </div>
 </div>
 
+<?= $this->endSection() ?>
+
+<?= $this->section('scripts') ?>
+<script>
+    $(document).ready(function () {
+        let table = $('#distribusi-atk').DataTable({
+        responsive: true,
+        ordering: true,
+        scrollX: true,
+        lengthChange: false,
+        autoWidth: false,
+        buttons: [
+            {
+                extend: 'colvis',
+                text: '<i class="fas fa-eye"></i> Colvis',
+            },
+            {
+                extend: 'excel',
+                text: '<i class="fas fa-file-excel"></i> Excel',
+                className: 'btn btn-success btn-sm',
+                exportOptions: {
+                    columns: ':visible',
+                    format: {
+                        body: function (data, row, column, node) {
+                            // Kolom No ada di index 0
+                            if (column === 0) {
+                                return row + 1; // isi manual nomor urut
+                            }
+                            return data;
+                        }
+                    }
+                }
+            },
+            {
+                extend: 'pdf',
+                text: '<i class="fas fa-file-pdf"></i> PDF',
+                className: 'btn btn-danger btn-sm',
+                exportOptions: {
+                    columns: ':visible',
+                    format: {
+                        body: function (data, row, column, node) {
+                            if (column === 0) {
+                                return row + 1;
+                            }
+                            return data;
+                        }
+                    }
+                }
+            },
+            {
+                extend: 'print',
+                text: '<i class="fas fa-print"></i> Print',
+                className: 'btn btn-info btn-sm',
+                exportOptions: {
+                    columns: ':visible',
+                    format: {
+                        body: function (data, row, column, node) {
+                            if (column === 0) {
+                                return row + 1;
+                            }
+                            return data;
+                        }
+                    }
+                }
+            }
+        ],
+        columnDefs: [
+            { orderable: false, targets: [0, -1] }
+        ]
+    });
+
+    // tombol ke posisi adminlte default
+    table.buttons().container().appendTo('#distribusi-atk_wrapper .col-md-6:eq(0)');
+
+    // auto numbering di tabel (untuk tampilan web)
+    table.on('order.dt search.dt draw.dt', function () {
+        let i = 1;
+        table.column(0, { search: 'applied', order: 'applied' })
+            .nodes()
+            .each(function (cell) {
+                cell.innerHTML = i++;
+            });
+    }).draw();
+
+    });
+
+    <?php if (session()->getFlashdata('success')): ?>
+        toastr.success("<?= session()->getFlashdata('success') ?>");
+    <?php endif; ?>
+
+    <?php if (session()->getFlashdata('error')): ?>
+        toastr.error("<?= session()->getFlashdata('error') ?>");
+    <?php endif; ?>
+
+    <?php if (session()->getFlashdata('warning')): ?>
+        toastr.warning("<?= session()->getFlashdata('warning') ?>");
+    <?php endif; ?>
+
+    <?php if (session()->getFlashdata('info')): ?>
+        toastr.info("<?= session()->getFlashdata('info') ?>");
+    <?php endif; ?>
+</script>
 <?= $this->endSection() ?>

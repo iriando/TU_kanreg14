@@ -39,8 +39,10 @@
                         <td><?= $a->sisa ?></td>
                         <?php if (in_groups('admin')): ?>
                         <td>
-                            <a href="<?= site_url('atk/edit/'.$a->id) ?>" class="btn btn-warning btn-sm">Edit</a>
-                            <a href="<?= site_url('atk/delete/'.$a->id) ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin hapus?')">Hapus</a>
+                            <div class="btn-group" role="group">
+                                <a href="<?= site_url('atk/edit/'.$a->id) ?>" class="btn btn-warning btn-sm">Edit</a>
+                                <a href="<?= site_url('atk/delete/'.$a->id) ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin hapus?')">Hapus</a>
+                            </div>
                         </td>
                         <?php endif; ?>
                     </tr>

@@ -94,6 +94,7 @@ class Peminjaman extends BaseController
         $data         = $this->peminjamanModel->find($id);
         $jumlahUnit   = count($unitKembali);
         $petugas      = user()->username;
+        $tanggal_kembali = $this->request->getPost('tanggal_kembali');
 
         if (!empty($unitKembali) && $data) {
             // Update status unit jadi tersedia
@@ -101,13 +102,14 @@ class Peminjaman extends BaseController
 
             // Insert log pengembalian
             $this->peminjamanModel->insert([
-                'transaksi_id'        => $dat->transaksi_id ?? $data->id,
+                'transaksi_id'        => $data->transaksi_id ?? $data->id,
                 'nama_peminjam'       => $data->nama_peminjam,
                 'kode_barang'         => $data->kode_barang,
                 'nama_barang'         => $data->nama_barang,
                 'jumlah'              => $jumlahUnit,
                 'tanggal_pinjam'      => $data->tanggal_pinjam,
-                'tanggal_kembali'     => date('Y-m-d H:i:s'),
+                'tanggal_kembali'     => $tanggal_kembali,
+                'petugas_pinjam'      => $data->petugas_pinjam,
                 'petugas_kembalikan'  => $petugas,
                 'status'              => 'dikembalikan',
             ]);

@@ -4,15 +4,18 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use App\Models\ObatModel;
+use App\Models\DistribusiObatModel;
 use CodeIgniter\Exceptions\PageNotFoundException;
 
 class Obat extends BaseController
 {
     protected $obatModel;
+    protected $distribusiobatModel;
 
     public function __construct()
     {
         $this->obatModel = new ObatModel();
+        $this->distribusiobatModel = new DistribusiObatModel();
     }
 
     public function index()
@@ -28,26 +31,35 @@ class Obat extends BaseController
 
     public function store()
     {
-        $rules = [
-            'kode_barang' => 'required|is_unique[obat.kode_barang]',
-            'nama_barang' => 'required',
-            'satuan'    => 'required',
-            'jumlah'      => 'required|integer',
-            'kedaluwarsa'      => 'required|date',
+        $data = [
+            'kode_barang'  => $this->request->getPost('kode_barang'),
+            'nama_barang'  => $this->request->getPost('nama_barang'),
+            'satuan'       => $this->request->getPost('satuan'),
+            'jumlah'       => (int) $this->request->getPost('jumlah'),
+            'kedaluwarsa'  => $this->request->getPost('kedaluwarsa'),
+            'didistribusi' => 0,
+            'sisa'         => (int) $this->request->getPost('jumlah'),
         ];
 
-        if (!$this->validate($rules)) {
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        // validasi sesuai rule insert
+        $this->obatModel->setValidationRules($this->obatModel->getValidationRules());
+
+        if (! $this->obatModel->insert($data)) {
+            return redirect()->back()->withInput()->with('errors', $this->obatModel->errors());
         }
 
-        $this->obatModel->insert([
-            'kode_barang' => $this->request->getPost('kode_barang'),
-            'nama_barang' => $this->request->getPost('nama_barang'),
-            'satuan'    => $this->request->getPost('satuan'),
-            'jumlah'      => $this->request->getPost('jumlah'),
-            'kedaluwarsa'      => $this->request->getPost('kedaluwarsa'),
-            'didistribusi'    => 0,
-            'sisa'        => $this->request->getPost('jumlah'),
+        $petugas = user()->username ?? 'system';
+
+        // log distribusi awal
+        $this->distribusiobatModel->insert([
+            'kode_barang'        => $data['kode_barang'],
+            'nama_barang'        => $data['nama_barang'],
+            'jumlah'             => $data['jumlah'],
+            'nama_penerima'      => '-',
+            'tanggal_distribusi' => date('Y-m-d'),
+            'petugas'            => $petugas,
+            'keterangan'         => 'Tambah stok',
+            'created_at'         => date('Y-m-d H:i:s'),
         ]);
 
         return redirect()->to('/obat')->with('message', 'Obat-obatan berhasil ditambahkan');
@@ -56,35 +68,95 @@ class Obat extends BaseController
     public function edit($id)
     {
         $obat = $this->obatModel->find($id);
-        if (!$obat) {
+        if (! $obat) {
             throw new PageNotFoundException("Obat dengan ID $id tidak ditemukan");
         }
-
         return view('admin/obat/edit', ['obat' => $obat]);
     }
 
     public function update($id)
     {
-        $data = $this->request->getPost();
-        $data['id'] = $id;
-        $this->obatModel->setValidationRules([
-            'kode_barang' => "required|is_unique[obat.kode_barang,id,{$id}]",
-            'nama_barang' => 'required',
-            'satuan'      => 'required',
-            'jumlah'      => 'required|integer',
-            'kedaluwarsa' => 'required|date',
-        ]);
+        $obatLama = $this->obatModel->find($id);
+        if (! $obatLama) {
+            return redirect()->to('/obat')->with('error', 'Data obat tidak ditemukan');
+        }
 
-        if (!$this->obatModel->save($data)) {
-            return redirect()->back()->withInput()->with('errors', $this->obatModel->errors());
+        $jumlahBaru = (int) $this->request->getPost('jumlah');
+        $jumlahLama = (int) $obatLama->jumlah;
+        $selisih    = $jumlahBaru - $jumlahLama;
+
+        $data = [
+            'id'          => $id,
+            'kode_barang' => $this->request->getPost('kode_barang'),
+            'nama_barang' => $this->request->getPost('nama_barang'),
+            'satuan'      => $this->request->getPost('satuan'),
+            'jumlah'      => $jumlahBaru,
+            'kedaluwarsa' => $this->request->getPost('kedaluwarsa'),
+            'didistribusi'=> (int) $obatLama->didistribusi,
+            'sisa'        => max(0, $jumlahBaru - (int) $obatLama->didistribusi),
+        ];
+
+        try {
+            $this->obatModel->save($data);
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Kode barang sudah digunakan!');
+        }
+
+        $petugas = user()->username ?? 'system';
+
+        if ($selisih > 0) {
+            $this->distribusiobatModel->insert([
+                'kode_barang'        => $data['kode_barang'],
+                'nama_barang'        => $data['nama_barang'],
+                'jumlah'             => $selisih,
+                'nama_penerima'      => '-',
+                'tanggal_distribusi' => date('Y-m-d'),
+                'petugas'            => $petugas,
+                'keterangan'         => 'Tambah stok',
+                'created_at'         => date('Y-m-d H:i:s'),
+            ]);
+        }
+
+        if ($selisih < 0) {
+            $this->distribusiobatModel->insert([
+                'kode_barang'        => $data['kode_barang'],
+                'nama_barang'        => $data['nama_barang'],
+                'jumlah'             => abs($selisih),
+                'nama_penerima'      => '-',
+                'tanggal_distribusi' => date('Y-m-d'),
+                'petugas'            => $petugas,
+                'keterangan'         => 'Koreksi stok (pengurangan)',
+                'created_at'         => date('Y-m-d H:i:s'),
+            ]);
         }
 
         return redirect()->to('/obat')->with('message', 'Obat berhasil diupdate');
     }
 
+
+
     public function delete($id)
     {
+        $obat = $this->obatModel->find($id);
+
+        if ($obat) {
+            $petugas = user()->username ?? 'system';
+            $this->distribusiobatModel->insert([
+                'kode_barang'        => $obat->kode_barang,
+                'nama_barang'        => $obat->nama_barang,
+                'jumlah'             => $obat->jumlah,
+                'nama_penerima'      => '-',
+                'tanggal_distribusi' => date('Y-m-d'),
+                'petugas'            => $petugas,
+                'keterangan'         => 'Obat dihapus',
+                'created_at'         => date('Y-m-d H:i:s'),
+            ]);
+        }
+
         $this->obatModel->delete($id);
-        return redirect()->to('/obat')->with('message', 'obat berhasil dihapus');
+
+        return redirect()->to('/obat')->with('message', 'Obat berhasil dihapus');
     }
 }

@@ -38,7 +38,7 @@ class DistribusiObat extends BaseController
     {
         $rules = [
             'kode_barang'        => 'required',
-            'jumlah'             => 'required|integer|greater_than_equal_to[1]',
+            'jumlah'             => 'required',
             'nama_penerima'      => 'required',
             'tanggal_distribusi' => 'required|valid_date',
         ];
@@ -46,27 +46,45 @@ class DistribusiObat extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        $kode = $this->request->getPost('kode_barang');
-        $obat = $this->db->table('obat')->where('kode_barang', $kode)->get()->getRow();
-        if (! $obat) {
-            return redirect()->back()->withInput()->with('errors', ['kode_barang'=>'Obat tidak ditemukan']);
+        $kodeBarangArr = $this->request->getPost('kode_barang'); // array
+        $jumlahArr     = $this->request->getPost('jumlah');      // array
+        $namaPenerima  = $this->request->getPost('nama_penerima');
+        $tanggal       = $this->request->getPost('tanggal_distribusi');
+        $keterangan    = $this->request->getPost('keterangan');
+        $petugas       = user()->username;
+
+        $this->db->transStart();
+
+        foreach ($kodeBarangArr as $i => $kode) {
+            $jumlah = (int) ($jumlahArr[$i] ?? 0);
+            if ($jumlah < 1) continue; // skip kalau kosong
+
+            $obat = $this->db->table('obat')->where('kode_barang', $kode)->get()->getRow();
+            if (! $obat) {
+                $this->db->transRollback();
+                return redirect()->back()->withInput()->with('errors', ['kode_barang'=>'Obat tidak ditemukan']);
+            }
+
+            $this->db->table('log_distribusiobat')->insert([
+                'kode_barang'        => $kode,
+                'nama_barang'        => $obat->nama_barang,
+                'jumlah'             => $jumlah,
+                'nama_penerima'      => $namaPenerima,
+                'tanggal_distribusi' => $tanggal,
+                'petugas'            => $petugas,
+                'keterangan'         => $keterangan,
+                'created_at'         => date('Y-m-d H:i:s'),
+            ]);
+
+            // update stok per obat
+            $this->recalcObat($kode);
         }
 
-        $this->db->table('log_distribusiobat')->insert([
-            'kode_barang'        => $kode,
-            'nama_barang'        => $obat->nama_barang,
-            'jumlah'             => (int) $this->request->getPost('jumlah'),
-            'nama_penerima'      => $this->request->getPost('nama_penerima'),
-            'tanggal_distribusi' => $this->request->getPost('tanggal_distribusi'),
-            'petugas'            => user()->username,
-            'keterangan'         => $this->request->getPost('keterangan'),
-            'created_at'         => date('Y-m-d H:i:s'),
-        ]);
-
-        $this->recalcObat($kode);
+        $this->db->transComplete();
 
         return redirect()->to('/distribusiobat')->with('message', 'Distribusi obat berhasil ditambahkan');
     }
+
 
     // Form edit
     public function edit($id)
