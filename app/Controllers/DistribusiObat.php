@@ -28,7 +28,7 @@ class DistribusiObat extends BaseController
             ->join('obat o', 'o.kode_barang = l.kode_barang', 'left');
         $sql1 = $builder1->getCompiledSelect();
         $builder2 = $db->table('log_obat lo')
-            ->select("lo.id, lo.kode_barang, o.nama_barang, o.satuan, lo.jumlah, '' AS nama_penerima, lo.created_at AS tanggal, lo.petugas, lo.keterangan, 'Log Obat' as jenis")
+            ->select("lo.id, lo.kode_barang, lo.nama_barang, o.satuan, lo.jumlah, '' AS nama_penerima, lo.created_at AS tanggal, lo.petugas, lo.keterangan, 'Log Obat' as jenis")
             ->join('obat o', 'o.kode_barang = lo.kode_barang', 'left');
         $sql2 = $builder2->getCompiledSelect();
         $sql = "({$sql1}) UNION ALL ({$sql2}) ORDER BY tanggal DESC";
@@ -42,7 +42,6 @@ class DistribusiObat extends BaseController
         return view('distribusiobat/create', ['obat' => $obat]);
     }
 
-    // Simpan distribusi
     public function store()
     {
         $rules = [
@@ -73,7 +72,7 @@ class DistribusiObat extends BaseController
 
             $this->distribusiobatModel->insert([
                 'kode_barang'        => $kode,
-                'nama_barang'        => $obat['nama_barang'],
+                'nama_barang'        => $obat->nama_barang,
                 'jumlah'             => $jumlah,
                 'nama_penerima'      => $namaPenerima,
                 'tanggal_distribusi' => $tanggal,
@@ -103,7 +102,6 @@ class DistribusiObat extends BaseController
         ]);
     }
 
-    // Update distribusi
     public function update($id)
     {
         $rules = [
@@ -138,18 +136,16 @@ class DistribusiObat extends BaseController
         return redirect()->to('/distribusiobat')->with('message', 'Distribusi obat berhasil diupdate');
     }
 
-    // Hapus distribusi
     public function delete($id)
     {
         $row = $this->distribusiobatModel->find($id);
         if ($row) {
             $this->distribusiobatModel->delete($id);
-            $this->recalcObat($row['kode_barang']);
+            $this->recalcObat($row->kode_barang);
         }
         return redirect()->to('/distribusiobat')->with('message', 'Distribusi obat berhasil dihapus');
     }
 
-    // Hitung ulang didistribusi & sisa pada tabel obat.
     private function recalcObat(string $kodeBarang): void
     {
         $obat = $this->obatModel->where('kode_barang', $kodeBarang)->first();
@@ -158,9 +154,9 @@ class DistribusiObat extends BaseController
         $didistribusi = (int) $this->distribusiobatModel
             ->selectSum('jumlah')
             ->where('kode_barang', $kodeBarang)
-            ->first()['jumlah'] ?? 0;
+            ->first()->jumlah ?? 0;
 
-        $sisa = (int) $obat['jumlah'] - $didistribusi;
+        $sisa = (int) $obat->jumlah - $didistribusi;
 
         $this->obatModel->where('kode_barang', $kodeBarang)->set([
             'didistribusi' => $didistribusi,

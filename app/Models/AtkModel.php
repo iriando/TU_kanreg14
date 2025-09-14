@@ -71,6 +71,16 @@ class AtkModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
+    public function getValidationRules(array $data = []): array
+    {
+        return [
+            'kode_barang' => 'required',
+            'nama_barang' => 'required',
+            'satuan'      => 'required',
+            'jumlah'      => 'required|integer',
+        ];
+    }
+    
     public function getAll()
     {
         return $this->findAll();

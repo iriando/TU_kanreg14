@@ -44,7 +44,7 @@
 
                 <div class="col form-group">
                     <label for="tanggal_distribusi">Tanggal Distribusi</label>
-                    <input type="date" name="tanggal_distribusi" class="form-control" value="<?= date('Y-m-d') ?>" required>
+                    <input type="datetime-local" name="tanggal_distribusi" class="form-control" value="<?= date('Y-m-d') ?>" required>
                 </div>
             </div>
 

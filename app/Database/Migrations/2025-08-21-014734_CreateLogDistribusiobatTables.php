@@ -33,7 +33,7 @@ class CreateLogDistribusiobatTables extends Migration
                 'default'    => 1,
             ],
             'tanggal_distribusi' => [
-                'type' => 'DATE',
+                'type' => 'DATETIME',
                 'null' => false,
             ],
             'keterangan' => [
