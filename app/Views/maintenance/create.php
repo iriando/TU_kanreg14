@@ -3,7 +3,7 @@
 
 <div class="card card-primary">
     <div class="card-header">
-        <h3 class="card-title">Tambah Peminjaman BMN</h3>
+        <h3 class="card-title">Tambah Pemeliharaan BMN</h3>
     </div>
     <div class="card-body">
         <?php if(session()->getFlashdata('errors')): ?>

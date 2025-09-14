@@ -71,11 +71,11 @@ class PeminjamanModel extends Model
     public function getTotalPinjam($transaksiId)
     {
         return (int) $this->where('transaksi_id', $transaksiId)
-                         ->where('status', 'pinjam')
-                         ->selectSum('jumlah')
-                         ->get()
-                         ->getRow()
-                         ->jumlah ?? 0;
+            ->where('status', 'pinjam')
+            ->selectSum('jumlah')
+            ->get()
+            ->getRow()
+            ->jumlah ?? 0;
     }
 
     // Hitung total dikembalikan

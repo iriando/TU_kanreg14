@@ -58,12 +58,10 @@ class Maintenance extends BaseController
         $pengingat    = $this->request->getPost('pengingat');
         $hari         = $this->request->getPost('hari') ?? null;
 
-        // ambil data barang utama
         $barang = $this->barangModel
             ->where('kode_barang', $kode_barang)
             ->first();
 
-        // simpan log untuk setiap unit yang dipilih
         foreach ($barangunits as $unitId) {
             $unit = $this->unitModel->find($unitId);
             $this->maintenanceModel->insert([
@@ -81,6 +79,86 @@ class Maintenance extends BaseController
 
         return redirect()->to(site_url('maintenance'))->with('success', 'Data maintenance berhasil disimpan.');
     }
+
+    public function edit($id)
+    {
+        $maintenance = $this->maintenanceModel->find($id);
+        if (!$maintenance) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Data maintenance dengan ID $id tidak ditemukan");
+        }
+
+        // ambil semua barang master untuk dropdown
+        $barang = $this->barangModel->orderBy('id', 'DESC')->findAll();
+        // ambil semua unit barang
+        $units  = $this->unitModel->orderBy('id', 'DESC')->findAll();
+
+        return view('maintenance/edit', [
+            'maintenance' => $maintenance,
+            'barang'      => $barang,
+            'units'       => $units,
+        ]);
+    }
+
+    public function update($id)
+    {
+        $maintenance = $this->maintenanceModel->find($id);
+
+        if (!$maintenance) {
+            throw new \CodeIgniter\Exceptions\PageNotFoundException('Pemeliharaan tidak ditemukan');
+        }
+
+        $kodeBarang   = $this->request->getPost('kode_barang');
+        // $barang       = $this->barangModel->where('kode_barang', $kodeBarang)->first();
+
+        $data = [
+            'nama_petugas'   => $this->request->getPost('nama_petugas'),
+            'tanggal'  => $this->request->getPost('tanggal'),
+        ];
+
+        $this->maintenanceModel->update($id, $data);
+
+        return redirect()->to('/maintenance')->with('success', 'Data peminjaman berhasil diperbarui');
+    }
+
+    // public function update($id)
+    // {
+    //     $validation = \Config\Services::validation();
+
+    //     $rules = [
+    //         'nama_petugas' => 'required',
+    //         'tanggal'      => 'required',
+    //     ];
+
+    //     if (!$this->validate($rules)) {
+    //         return redirect()->back()->withInput()->with('errors', $validation->getErrors());
+    //     }
+
+    //     $nama_petugas = $this->request->getPost('nama_petugas');
+    //     $kode_barang  = $this->request->getPost('kode_barang');
+    //     $kode_unit    = $this->request->getPost('kode_unit');
+    //     $tanggal      = $this->request->getPost('tanggal');
+    //     $keterangan   = $this->request->getPost('keterangan');
+    //     $pengingat    = $this->request->getPost('pengingat');
+    //     $hari         = $this->request->getPost('hari') ?? null;
+
+    //     $barang = $this->barangModel->where('kode_barang', $kode_barang)->first();
+    //     $unit   = $this->unitModel->where('kode_unit', $kode_unit)->first();
+
+    //     $this->maintenanceModel->update($id, [
+    //         'nama_petugas' => $nama_petugas,
+    //         'nama_barang'  => $barang['nama_barang'] ?? null,
+    //         'kode_barang'  => $kode_barang,
+    //         'kode_unit'    => $kode_unit,
+    //         'unit'         => $unit['merk'] ?? null,
+    //         'tanggal'      => $tanggal,
+    //         'pengingat'    => $pengingat,
+    //         'hari'         => $pengingat === 'Aktif' ? $hari : null,
+    //         'keterangan'   => $keterangan,
+    //     ]);
+
+    //     return redirect()->to(site_url('maintenance'))->with('success', 'Data maintenance berhasil diperbarui.');
+    // }
+
 
     public function delete($id)
     {
