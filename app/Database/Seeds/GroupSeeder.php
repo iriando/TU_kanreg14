@@ -14,7 +14,11 @@ class GroupSeeder extends Seeder
                 'description' => 'Administrator, memiliki semua akses',
             ],
             [
-                'name'        => 'petugas',
+                'name'        => 'petugas BMN',
+                'description' => 'Petugas/operator dengan akses terbatas',
+            ],
+            [
+                'name'        => 'petugas klinik',
                 'description' => 'Petugas/operator dengan akses terbatas',
             ],
         ];

@@ -13,6 +13,7 @@
         <!-- Layanan -->
         <li class="nav-header">Layanan</li>
 
+        <?php if (in_groups(['admin', 'petugas_bmn'])): ?>
         <li class="nav-item">
           <a href="<?= base_url('peminjaman') ?>" class="nav-link">
             <i class="nav-icon fas fa-handshake"></i>
@@ -26,22 +27,28 @@
             <p>Distribusi ATK / ARTK</p>
           </a>
         </li>
+        <?php endif; ?>
 
+        <?php if (in_groups(['admin', 'petugas BMN', 'petugas klinik' ])): ?>
         <li class="nav-item">
           <a href="<?= base_url('distribusiobat') ?>" class="nav-link">
             <i class="nav-icon fas fa-book-medical"></i>
             <p>Distribusi Obat-obatan</p>
           </a>
         </li>
+        <?php endif; ?>
 
+        <?php if (in_groups(['admin', 'petugas BMN'])): ?>
         <li class="nav-item">
           <a href="<?= base_url('maintenance') ?>" class="nav-link">
             <i class="nav-icon fas fa-tools"></i>
             <p>Pemeliharaan</p>
           </a>
         </li>
+        <?php endif; ?>
 
         <!-- Barang Milik Negara -->
+        <?php if (in_groups(['admin'])): ?>
         <li class="nav-header">Barang</li>
 
         <li class="nav-item">
@@ -64,11 +71,12 @@
             <p>Obat</p>
           </a>
         </li>
+        <?php endif; ?>
 
         <!-- Pengaturan -->
+        <?php if (in_groups('admin')): ?>
         <li class="nav-header">Pengaturan</li>
 
-        <?php if (in_groups('admin')): ?>
         <li class="nav-item">
           <a href="<?= site_url('usermanager/users') ?>" class="nav-link">
             <i class="nav-icon fas fa-users-cog"></i>
