@@ -4,7 +4,7 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class LogDistribusiAtkTables extends Migration
+class Createlogmaintenancetables extends Migration
 {
     public function up()
     {
@@ -15,32 +15,39 @@ class LogDistribusiAtkTables extends Migration
                 'unsigned'       => true,
                 'auto_increment' => true,
             ],
-            'nama_penerima' => [
+            'nama_petugas' => [
                 'type'       => 'VARCHAR',
-                'constraint' => '255',
-            ],
-            'kode_barang' => [
-                'type'       => 'VARCHAR',
-                'constraint' => '50',
+                'constraint' => 255,
             ],
             'nama_barang' => [
                 'type'       => 'VARCHAR',
-                'constraint' => '255',
+                'constraint' => 255,
             ],
-            'jumlah' => [
-                'type'       => 'INT',
-                'constraint' => 11,
-                'default'    => 1,
+            'kode_barang' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 50,
             ],
-            'tanggal_distribusi' => [
+            'kode_unit' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 50,
+            ],
+            'unit' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 255,
+            ],
+            'tanggal' => [
                 'type' => 'DATETIME',
-                'null' => false,
+            ],
+            'pengingat' => [
+                'type'      => 'BOOLEAN',
+                'default'   => '0',
+            ],
+            'hari' => [
+                'type'           => 'INT',
+                'constraint'     => 255,
+                'null'    => true,
             ],
             'keterangan' => [
-                'type' => 'TEXT',
-                'null' => true,
-            ],
-            'petugas' => [
                 'type'       => 'VARCHAR',
                 'constraint' => 255,
             ],
@@ -49,17 +56,17 @@ class LogDistribusiAtkTables extends Migration
                 'null' => true,
             ],
             'updated_at' => [
-                'type' => 'DATETIME',
-                'null' => true,
+                'type'    => 'DATETIME',
+                'null'    => true,
             ],
         ]);
 
         $this->forge->addKey('id', true);
-        $this->forge->createTable('log_distribusiatk');
+        $this->forge->createTable('log_maintenance', true);
     }
 
     public function down()
     {
-        $this->forge->dropTable('log_distribusiatk');
+        $this->forge->dropTable('log_maintenance', true);
     }
 }

@@ -24,7 +24,7 @@
                 <th>Kode Barang</th>
                 <th>Jumlah</th>
                 <th>Satuan</th>
-                <th>Tanggal Distribusi</th>
+                <th>Tanggal</th>
                 <th>Petugas</th>
                 <th>Keterangan</th>
                 <?php if (in_groups('admin')): ?>
@@ -36,21 +36,23 @@
             <?php foreach($distribusi as $d): ?>
                 <tr>
                     <td></td>
-                    <td><?= esc($d->nama_penerima) ?></td>
-                    <td><?= esc($d->obat_nama ?? $d->nama_barang) ?></td>
+                    <td><?= esc($d->nama_penerima ?? '-') ?></td>
+                    <td><?= esc($d->nama_barang) ?></td>
                     <td><?= esc($d->kode_barang) ?></td>
                     <td><?= esc($d->jumlah) ?></td>
                     <td><?= esc($d->satuan ?? '-') ?></td>
-                    <td><?= esc($d->tanggal_distribusi) ?></td>
-                    <td><?= $d->petugas ?></td>
+                    <td><?= esc($d->tanggal) ?></td>
+                    <td><?= esc($d->petugas ?? '-') ?></td>
                     <td><?= esc($d->keterangan ?? '-') ?></td>
-                    <?php if (in_groups('admin')): ?>
+                    <?php if (in_groups('admin') && $d->jenis === 'Distribusi'): ?>
                     <td>
                         <div class="btn-group" role="group">
                             <a href="<?= site_url('distribusiobat/edit/'.$d->id) ?>" class="btn btn-warning btn-sm">Edit</a>
                             <a href="<?= site_url('distribusiobat/delete/'.$d->id) ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin hapus?')">Hapus</a>
                         </div>
                     </td>
+                    <?php elseif (in_groups('admin')): ?>
+                    <td>-</td>
                     <?php endif; ?>
                 </tr>
             <?php endforeach; ?>

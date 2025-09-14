@@ -14,13 +14,13 @@
 <div class="login-box">
   <!-- Logo -->
   <div class="login-logo">
-    <a href="#"><b>Aplikasi</b> Tata Usaha <b>Kanreg XIV BKN<b></a>
+    <a href="#"><b>S</b>istem <b>I</b>nformasi <b>MA</b>najemen <b>P</b>ersedi<b>AN</b></a>
   </div>
 
   <!-- Card -->
   <div class="card">
     <div class="card-body login-card-body">
-      <p class="login-box-msg">Form Login</p>
+      <p class="login-box-msg">Login</p>
 
       <!-- Form Login -->
       <form action="<?= url_to('login') ?>" method="post">

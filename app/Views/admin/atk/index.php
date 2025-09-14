@@ -5,7 +5,6 @@
     <div class="card-header">
         <h3 class="card-title">Daftar ATK</h3>
         <div class="card-tools">
-            <a href="<?= site_url('distribusiatk') ?>" class="btn btn-danger btn-sm">Kembali</a>
             <?php if (in_groups('admin')): ?>
             <a href="<?= site_url('atk/create') ?>" class="btn btn-primary btn-sm">Tambah ATK</a>
             <?php endif; ?>

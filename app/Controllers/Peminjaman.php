@@ -23,18 +23,13 @@ class Peminjaman extends BaseController
 
     public function index()
     {
-        // ambil semua log peminjaman (urut terbaru dulu)
         $peminjaman = $this->peminjamanModel->orderBy('id', 'DESC')->findAll();
-        // cache sisa per transaksi supaya tidak query berkali-kali
         $sisaMap = [];
         foreach ($peminjaman as $p) {
-            // pastikan kita pakai transaksi_id sebagai key; kalau belum ada pakai id sendiri
             $transId = $p->transaksi_id ?? $p->id;
             if (! isset($sisaMap[$transId])) {
-                // getSisaPinjam harus mengembalikan integer sisa (pinjam - kembali)
                 $sisaMap[$transId] = $this->peminjamanModel->getSisaPinjam($transId);
             }
-            // pasang properti sisa ke tiap record supaya view bisa pakai $p->sisa
             $p->sisa = $sisaMap[$transId];
         }
         return view('peminjaman/index', ['peminjaman' => $peminjaman]);

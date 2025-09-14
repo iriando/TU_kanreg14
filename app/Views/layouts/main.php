@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title><?= $title ?? 'Aplikasi Asset BMN' ?></title>
+  <title><?= $title ?? 'SiMAPAN' ?></title>
 
   <!-- CSS AdminLTE -->
   <link rel="stylesheet" href="<?= base_url('adminlte/dist/css/adminlte.min.css') ?>">

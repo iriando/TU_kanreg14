@@ -1,7 +1,7 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
   <!-- Brand Logo -->
   <a href="<?= base_url('/') ?>" class="brand-link">
-    <span class="brand-text font-weight-light">Asset BMN</span>
+    <span class="brand-text font-weight-light">SIMAPAN</span>
   </a>
 
   <!-- Sidebar -->
@@ -10,8 +10,8 @@
     <nav class="mt-2">
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
 
-        <!-- Barang Milik Negara -->
-        <li class="nav-header">Barang Milik Negara</li>
+        <!-- Layanan -->
+        <li class="nav-header">Layanan</li>
 
         <li class="nav-item">
           <a href="<?= base_url('peminjaman') ?>" class="nav-link">
@@ -22,22 +22,46 @@
 
         <li class="nav-item">
           <a href="<?= base_url('distribusiatk') ?>" class="nav-link">
-            <i class="nav-icon fas fa-pencil-alt"></i>
-            <p>ATK / ARTK</p>
+            <i class="nav-icon fas fa-parachute-box"></i>
+            <p>Distribusi ATK / ARTK</p>
           </a>
         </li>
 
         <li class="nav-item">
           <a href="<?= base_url('distribusiobat') ?>" class="nav-link">
-            <i class="nav-icon fas fa-pills"></i>
-            <p>Obat-obatan</p>
+            <i class="nav-icon fas fa-book-medical"></i>
+            <p>Distribusi Obat-obatan</p>
           </a>
         </li>
 
         <li class="nav-item">
           <a href="<?= base_url('maintenance') ?>" class="nav-link">
             <i class="nav-icon fas fa-tools"></i>
-            <p>Maintenance BMN</p>
+            <p>Pemeliharaan</p>
+          </a>
+        </li>
+
+        <!-- Barang Milik Negara -->
+        <li class="nav-header">Barang</li>
+
+        <li class="nav-item">
+          <a href="<?= base_url('barang') ?>" class="nav-link">
+            <i class="nav-icon fas fa-handshake"></i>
+            <p>Barang Milik Negara</p>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a href="<?= base_url('atk') ?>" class="nav-link">
+            <i class="nav-icon fas fa-pencil-alt"></i>
+            <p>ATK / ARTK</p>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a href="<?= base_url('obat') ?>" class="nav-link">
+            <i class="nav-icon fas fa-pills"></i>
+            <p>Obat</p>
           </a>
         </li>
 

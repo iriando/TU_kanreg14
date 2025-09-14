@@ -17,6 +17,7 @@
         <?php endif; ?>
 
         <form action="<?= site_url('distribusiobat/update/'.$distribusi->id) ?>" method="post">
+            <?= csrf_field() ?>
         <div class="form-group">
             <label for="kode_barang">Obat</label>
             <select name="kode_barang" class="form-control" required>
@@ -41,7 +42,7 @@
 
         <div class="form-group">
             <label for="tanggal_distribusi">Tanggal Distribusi</label>
-            <input type="date" name="tanggal_distribusi" class="form-control" value="<?= old('tanggal_distribusi', $distribusi->tanggal_distribusi) ?>" required>
+            <input type="datetime-local" name="tanggal_distribusi" class="form-control" value="<?= old('tanggal_distribusi', $distribusi->tanggal_distribusi) ?>" required>
         </div>
 
         <div class="form-group">

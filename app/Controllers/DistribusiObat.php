@@ -3,37 +3,46 @@
 namespace App\Controllers;
 
 use App\Controllers\BaseController;
-use Config\Database;
+use App\Models\DistribusiObatModel;
+use App\Models\LogObatModel;
+use App\Models\ObatModel;
 
 class DistribusiObat extends BaseController
 {
-    protected $db;
+    protected $distribusiobatModel;
+    protected $logObatModel;
+    protected $obatModel;
 
     public function __construct()
     {
-        $this->db = Database::connect();
+        $this->distribusiobatModel = new DistribusiObatModel();
+        $this->logObatModel        = new LogObatModel();
+        $this->obatModel           = new ObatModel();
     }
 
-    // List semua distribusi
     public function index()
     {
-        $rows = $this->db->table('log_distribusiobat lo')
-            ->select('lo.*, o.nama_barang AS obat_nama, o.satuan')
-            ->join('obat o', 'o.kode_barang = lo.kode_barang', 'left')
-            ->orderBy('lo.id', 'ASC')
-            ->get()->getResult();
-
+        $db = \Config\Database::connect();
+        $builder1 = $db->table('log_distribusiobat l')
+            ->select("l.id, l.kode_barang, o.nama_barang, o.satuan, l.jumlah, l.nama_penerima, l.tanggal_distribusi AS tanggal, l.petugas, l.keterangan, 'Distribusi' as jenis")
+            ->join('obat o', 'o.kode_barang = l.kode_barang', 'left');
+        $sql1 = $builder1->getCompiledSelect();
+        $builder2 = $db->table('log_obat lo')
+            ->select("lo.id, lo.kode_barang, o.nama_barang, o.satuan, lo.jumlah, '' AS nama_penerima, lo.created_at AS tanggal, lo.petugas, lo.keterangan, 'Log Obat' as jenis")
+            ->join('obat o', 'o.kode_barang = lo.kode_barang', 'left');
+        $sql2 = $builder2->getCompiledSelect();
+        $sql = "({$sql1}) UNION ALL ({$sql2}) ORDER BY tanggal DESC";
+        $rows = $db->query($sql)->getResult();
         return view('distribusiobat/index', ['distribusi' => $rows]);
     }
 
-    // Form create
     public function create()
     {
-        $obat = $this->db->table('obat')->orderBy('nama_barang','ASC')->get()->getResult();
+        $obat = $this->obatModel->orderBy('nama_barang','ASC')->findAll();
         return view('distribusiobat/create', ['obat' => $obat]);
     }
 
-    // Simpan
+    // Simpan distribusi
     public function store()
     {
         $rules = [
@@ -46,28 +55,25 @@ class DistribusiObat extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        $kodeBarangArr = $this->request->getPost('kode_barang'); // array
-        $jumlahArr     = $this->request->getPost('jumlah');      // array
+        $kodeBarangArr = $this->request->getPost('kode_barang'); 
+        $jumlahArr     = $this->request->getPost('jumlah');      
         $namaPenerima  = $this->request->getPost('nama_penerima');
         $tanggal       = $this->request->getPost('tanggal_distribusi');
         $keterangan    = $this->request->getPost('keterangan');
         $petugas       = user()->username;
 
-        $this->db->transStart();
-
         foreach ($kodeBarangArr as $i => $kode) {
             $jumlah = (int) ($jumlahArr[$i] ?? 0);
-            if ($jumlah < 1) continue; // skip kalau kosong
+            if ($jumlah < 1) continue;
 
-            $obat = $this->db->table('obat')->where('kode_barang', $kode)->get()->getRow();
+            $obat = $this->obatModel->where('kode_barang', $kode)->first();
             if (! $obat) {
-                $this->db->transRollback();
                 return redirect()->back()->withInput()->with('errors', ['kode_barang'=>'Obat tidak ditemukan']);
             }
 
-            $this->db->table('log_distribusiobat')->insert([
+            $this->distribusiobatModel->insert([
                 'kode_barang'        => $kode,
-                'nama_barang'        => $obat->nama_barang,
+                'nama_barang'        => $obat['nama_barang'],
                 'jumlah'             => $jumlah,
                 'nama_penerima'      => $namaPenerima,
                 'tanggal_distribusi' => $tanggal,
@@ -76,24 +82,20 @@ class DistribusiObat extends BaseController
                 'created_at'         => date('Y-m-d H:i:s'),
             ]);
 
-            // update stok per obat
             $this->recalcObat($kode);
         }
-
-        $this->db->transComplete();
 
         return redirect()->to('/distribusiobat')->with('message', 'Distribusi obat berhasil ditambahkan');
     }
 
-
     // Form edit
     public function edit($id)
     {
-        $row = $this->db->table('log_distribusiobat')->where('id', $id)->get()->getRow();
+        $row = $this->distribusiobatModel->find($id);
         if (! $row) {
             throw new \CodeIgniter\Exceptions\PageNotFoundException('Data distribusi tidak ditemukan');
         }
-        $obat = $this->db->table('obat')->orderBy('nama_barang','ASC')->get()->getResult();
+        $obat = $this->obatModel->orderBy('nama_barang','ASC')->findAll();
 
         return view('distribusiobat/edit', [
             'distribusi' => $row,
@@ -101,7 +103,7 @@ class DistribusiObat extends BaseController
         ]);
     }
 
-    // Update
+    // Update distribusi
     public function update($id)
     {
         $rules = [
@@ -115,14 +117,14 @@ class DistribusiObat extends BaseController
         }
 
         $kode = $this->request->getPost('kode_barang');
-        $obat = $this->db->table('obat')->where('kode_barang', $kode)->get()->getRow();
+        $obat = $this->obatModel->where('kode_barang', $kode)->first();
         if (! $obat) {
             return redirect()->back()->withInput()->with('errors', ['kode_barang'=>'Obat tidak ditemukan']);
         }
 
-        $this->db->table('log_distribusiobat')->where('id', $id)->update([
+        $this->distribusiobatModel->update($id, [
             'kode_barang'        => $kode,
-            'nama_barang'        => $obat->nama_barang,
+            'nama_barang'        => $obat['nama_barang'],
             'jumlah'             => (int) $this->request->getPost('jumlah'),
             'nama_penerima'      => $this->request->getPost('nama_penerima'),
             'tanggal_distribusi' => $this->request->getPost('tanggal_distribusi'),
@@ -136,36 +138,34 @@ class DistribusiObat extends BaseController
         return redirect()->to('/distribusiobat')->with('message', 'Distribusi obat berhasil diupdate');
     }
 
-    // Hapus
+    // Hapus distribusi
     public function delete($id)
     {
-        $row = $this->db->table('log_distribusiobat')->where('id', $id)->get()->getRow();
+        $row = $this->distribusiobatModel->find($id);
         if ($row) {
-            $this->db->table('log_distribusiobat')->where('id', $id)->delete();
-            $this->recalcObat($row->kode_barang);
+            $this->distribusiobatModel->delete($id);
+            $this->recalcObat($row['kode_barang']);
         }
         return redirect()->to('/distribusiobat')->with('message', 'Distribusi obat berhasil dihapus');
     }
 
-    /**
-     * Hitung ulang didistribusi & sisa pada tabel obat.
-     */
+    // Hitung ulang didistribusi & sisa pada tabel obat.
     private function recalcObat(string $kodeBarang): void
     {
-        $obat = $this->db->table('obat')->where('kode_barang', $kodeBarang)->get()->getRow();
+        $obat = $this->obatModel->where('kode_barang', $kodeBarang)->first();
         if (! $obat) return;
 
-        $didistribusi = (int) ($this->db->table('log_distribusiobat')
+        $didistribusi = (int) $this->distribusiobatModel
             ->selectSum('jumlah')
             ->where('kode_barang', $kodeBarang)
-            ->get()->getRow()->jumlah ?? 0);
+            ->first()['jumlah'] ?? 0;
 
-        $sisa = (int) $obat->jumlah - $didistribusi;
+        $sisa = (int) $obat['jumlah'] - $didistribusi;
 
-        $this->db->table('obat')->where('kode_barang', $kodeBarang)->update([
+        $this->obatModel->where('kode_barang', $kodeBarang)->set([
             'didistribusi' => $didistribusi,
             'sisa'         => $sisa,
             'updated_at'   => date('Y-m-d H:i:s'),
-        ]);
+        ])->update();
     }
 }

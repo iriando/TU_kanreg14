@@ -5,7 +5,6 @@
     <div class="card-header">
         <h3 class="card-title">Daftar Barang</h3>
         <div class="card-tools">
-            <a href="<?= site_url('peminjaman') ?>" class="btn btn-secondary btn-sm">Kembali</a>
             <a href="<?= site_url('barang/create') ?>" class="btn btn-primary btn-sm">Tambah Barang</a>
         </div>
     </div>

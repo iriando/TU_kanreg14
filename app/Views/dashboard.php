@@ -2,8 +2,8 @@
 <?= $this->section('content') ?>
 
 <div class="container-fluid">
-  <h1>Dashboard Asset BMN</h1>
-  <p>Selamat datang di aplikasi pengelolaan Asset BMN.</p>
+  <h1>Dashboard SIMAPAN</h1>
+  <h4>Selamat datang di aplikasi Sistem Informasi Manajemen Asset & Persediaan.</h4>
 </div>
 
 <?= $this->endSection() ?>

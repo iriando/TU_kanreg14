@@ -5,17 +5,20 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use App\Models\ObatModel;
 use App\Models\DistribusiObatModel;
+use App\Models\LogObatModel;
 use CodeIgniter\Exceptions\PageNotFoundException;
 
 class Obat extends BaseController
 {
     protected $obatModel;
     protected $distribusiobatModel;
+    protected $logObatModel;
 
     public function __construct()
     {
-        $this->obatModel = new ObatModel();
+        $this->obatModel         = new ObatModel();
         $this->distribusiobatModel = new DistribusiObatModel();
+        $this->logObatModel      = new LogObatModel();
     }
 
     public function index()
@@ -41,7 +44,7 @@ class Obat extends BaseController
             'sisa'         => (int) $this->request->getPost('jumlah'),
         ];
 
-        // validasi sesuai rule insert
+        // validasi
         $this->obatModel->setValidationRules($this->obatModel->getValidationRules());
 
         if (! $this->obatModel->insert($data)) {
@@ -50,16 +53,15 @@ class Obat extends BaseController
 
         $petugas = user()->username ?? 'system';
 
-        // log distribusi awal
-        $this->distribusiobatModel->insert([
-            'kode_barang'        => $data['kode_barang'],
-            'nama_barang'        => $data['nama_barang'],
-            'jumlah'             => $data['jumlah'],
-            'nama_penerima'      => '-',
-            'tanggal_distribusi' => date('Y-m-d'),
-            'petugas'            => $petugas,
-            'keterangan'         => 'Tambah stok',
-            'created_at'         => date('Y-m-d H:i:s'),
+        // log stok awal ke log_obat (bukan distribusi)
+        $this->logObatModel->insert([
+            'kode_barang' => $data['kode_barang'],
+            'nama_barang' => $data['nama_barang'],
+            'jumlah'      => $data['jumlah'],
+            'aksi'        => 'Tambah stok',
+            'keterangan'  => 'Stok awal',
+            'petugas'     => $petugas,
+            'created_at'  => date('Y-m-d H:i:s'),
         ]);
 
         return redirect()->to('/obat')->with('message', 'Obat-obatan berhasil ditambahkan');
@@ -107,35 +109,34 @@ class Obat extends BaseController
         $petugas = user()->username ?? 'system';
 
         if ($selisih > 0) {
-            $this->distribusiobatModel->insert([
-                'kode_barang'        => $data['kode_barang'],
-                'nama_barang'        => $data['nama_barang'],
-                'jumlah'             => $selisih,
-                'nama_penerima'      => '-',
-                'tanggal_distribusi' => date('Y-m-d'),
-                'petugas'            => $petugas,
-                'keterangan'         => 'Tambah stok',
-                'created_at'         => date('Y-m-d H:i:s'),
+            // log penambahan stok
+            $this->logObatModel->insert([
+                'kode_barang' => $data['kode_barang'],
+                'nama_barang' => $data['nama_barang'],
+                'jumlah'      => $selisih,
+                'aksi'        => 'Tambah stok',
+                'keterangan'  => 'Update obat (penambahan)',
+                'petugas'     => $petugas,
+                'updated_at'  => date('Y-m-d H:i:s'),
             ]);
         }
 
         if ($selisih < 0) {
-            $this->distribusiobatModel->insert([
-                'kode_barang'        => $data['kode_barang'],
-                'nama_barang'        => $data['nama_barang'],
-                'jumlah'             => abs($selisih),
-                'nama_penerima'      => '-',
-                'tanggal_distribusi' => date('Y-m-d'),
-                'petugas'            => $petugas,
-                'keterangan'         => 'Koreksi stok (pengurangan)',
-                'created_at'         => date('Y-m-d H:i:s'),
+            // log pengurangan stok
+            $this->logObatModel->insert([
+                'kode_barang' => $data['kode_barang'],
+                'nama_barang' => $data['nama_barang'],
+                'jumlah'      => abs($selisih),
+                'aksi'        => 'Koreksi stok',
+                'keterangan'  => 'Update obat (pengurangan)',
+                'petugas'     => $petugas,
+                'created_at'  => date('Y-m-d H:i:s'),
+                'updated_at'  => date('Y-m-d H:i:s'),
             ]);
         }
 
         return redirect()->to('/obat')->with('message', 'Obat berhasil diupdate');
     }
-
-
 
     public function delete($id)
     {
@@ -143,19 +144,20 @@ class Obat extends BaseController
 
         if ($obat) {
             $petugas = user()->username ?? 'system';
-            $this->distribusiobatModel->insert([
-                'kode_barang'        => $obat->kode_barang,
-                'nama_barang'        => $obat->nama_barang,
-                'jumlah'             => $obat->jumlah,
-                'nama_penerima'      => '-',
-                'tanggal_distribusi' => date('Y-m-d'),
-                'petugas'            => $petugas,
-                'keterangan'         => 'Obat dihapus',
-                'created_at'         => date('Y-m-d H:i:s'),
-            ]);
-        }
 
-        $this->obatModel->delete($id);
+            // log hapus stok
+            $this->logObatModel->insert([
+                'kode_barang' => $obat->kode_barang,
+                'nama_barang' => $obat->nama_barang,
+                'jumlah'      => $obat->jumlah,
+                'aksi'        => 'Hapus obat',
+                'keterangan'  => 'Obat dihapus dari sistem',
+                'petugas'     => $petugas,
+                'updated_at'  => date('Y-m-d H:i:s'),
+            ]);
+
+            $this->obatModel->delete($id);
+        }
 
         return redirect()->to('/obat')->with('message', 'Obat berhasil dihapus');
     }
