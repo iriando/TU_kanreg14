@@ -14,7 +14,7 @@
 <div class="login-box">
   <!-- Logo -->
   <div class="login-logo">
-    <a href="#"><b>S</b>istem <b>I</b>nformasi <b>MA</b>najemen <b>P</b>ersedi<b>AN</b></a>
+    <a href="#"><b>S</b>istem <b>I</b>nformasi <b>MA</b>najemen <b>P</b>erkantor<b>AN</b></a>
   </div>
 
   <!-- Card -->
