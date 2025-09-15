@@ -75,6 +75,10 @@
 
 <?= $this->section('scripts') ?>
 <script>
+    // document.getElementById('pengingat').addEventListener('change', function() {
+    // document.getElementById('hari-field').style.display = this.checked ? 'block' : 'none';
+    // });
+
     $(function () {
         $('.select2').select2();
 

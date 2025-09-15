@@ -2,12 +2,14 @@
 
 namespace App\Controllers;
 
+use Config\Services;
 use CodeIgniter\Controller;
+use Psr\Log\LoggerInterface;
+use App\Models\MaintenanceModel;
 use CodeIgniter\HTTP\CLIRequest;
 use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
-use Psr\Log\LoggerInterface;
 
 /**
  * Class BaseController
@@ -37,12 +39,14 @@ abstract class BaseController extends Controller
      */
     // protected $helpers = [];
     protected $helpers = ['auth', 'form', 'url'];
+    
 
     /**
      * Be sure to declare properties for any property fetch you initialized.
      * The creation of dynamic property is deprecated in PHP 8.2.
      */
     // protected $session;
+    protected $maintenanceModel;
 
     /**
      * @return void
@@ -51,6 +55,21 @@ abstract class BaseController extends Controller
     {
         // Do Not Edit This Line
         parent::initController($request, $response, $logger);
+
+        $this->maintenanceModel = new MaintenanceModel();
+        $notifikasi = [];
+
+        $notifikasi = $this->maintenanceModel
+            ->where('pengingat', 1) // hanya yg aktif
+            ->where('tanggal_pengingat <=', date('Y-m-d H:i:s'))
+            ->groupStart() // mulai group
+                ->where('status', 'Hari ini')
+                ->orWhere('status', 'Lewat')
+            ->groupEnd()   // tutup group
+            ->findAll();
+        // dd($notifikasi);
+        // die;
+        Services::renderer()->setVar('notifikasi', $notifikasi);
 
         // Preload any models, libraries, etc, here.
 

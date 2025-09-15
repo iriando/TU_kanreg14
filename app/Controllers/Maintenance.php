@@ -43,20 +43,26 @@ class Maintenance extends BaseController
             'barangunit'   => 'required',
             'tanggal'      => 'required',
             'keterangan'   => 'required',
-            'pengingat'    => 'required',
         ];
 
         if (!$this->validate($rules)) {
             return redirect()->back()->withInput()->with('errors', $validation->getErrors());
         }
-        
+
         $nama_petugas = $this->request->getPost('nama_petugas');
         $kode_barang  = $this->request->getPost('kode_barang');
         $barangunits  = $this->request->getPost('barangunit'); // array id unit
         $tanggal      = $this->request->getPost('tanggal');
         $keterangan   = $this->request->getPost('keterangan');
-        $pengingat    = $this->request->getPost('pengingat');
-        $hari         = $this->request->getPost('hari') ?? null;
+        
+        // pengingat: checkbox (1 atau 0)
+        $pengingat    = $this->request->getPost('pengingat') ? 1 : 0;
+        $hari         = $pengingat ? $this->request->getPost('hari') : null;
+
+        $tanggal_pengingat = null;
+        if ($pengingat && $hari) {
+            $tanggal_pengingat = date('Y-m-d H:i:s', strtotime($tanggal . ' + ' . $hari . ' days'));
+        }
 
         $barang = $this->barangModel
             ->where('kode_barang', $kode_barang)
@@ -64,16 +70,19 @@ class Maintenance extends BaseController
 
         foreach ($barangunits as $unitId) {
             $unit = $this->unitModel->find($unitId);
+
             $this->maintenanceModel->insert([
-                'nama_petugas' => $nama_petugas,
-                'nama_barang'  => $barang['nama_barang'],
-                'kode_barang'  => $kode_barang,
-                'kode_unit'    => $unit['kode_unit'],
-                'unit'         => $unit['merk'],
-                'tanggal'      => $tanggal,
-                'pengingat'    => $pengingat,
-                'hari'         => $pengingat === 'Aktif' ? $hari : null,
-                'keterangan'   => $keterangan,
+                'nama_petugas'      => $nama_petugas,
+                'nama_barang'       => $barang['nama_barang'],
+                'kode_barang'       => $kode_barang,
+                'kode_unit'         => $unit['kode_unit'],
+                'unit'              => $unit['merk'],
+                'tanggal'           => $tanggal,
+                'pengingat'         => $pengingat,
+                'hari'              => $hari,
+                'tanggal_pengingat' => $tanggal_pengingat,
+                'keterangan'        => $keterangan,
+                'status'            => 'Belum',
             ]);
         }
 
@@ -164,5 +173,11 @@ class Maintenance extends BaseController
     {
         $this->maintenanceModel->delete($id);
         return redirect()->to('/maintenance')->with('message', 'Log berhasil dihapus');
+    }
+
+    public function selesai($id)
+    {
+        $this->maintenanceModel->update($id, ['pengingat' => 0]);
+        return redirect()->back()->with('success', 'Pengingat berhasil ditandai selesai.');
     }
 }

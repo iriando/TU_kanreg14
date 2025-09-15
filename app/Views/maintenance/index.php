@@ -34,13 +34,18 @@
                         <td><?= esc($m->nama_petugas) ?></td>
                         <td><?= esc($m->nama_barang) ?></td>
                         <td><?= esc($m->unit) ?></td>
-                        <td><?= esc($m->created_at) ?></td>
+                        <td><?= esc($m->tanggal) ?></td>
                         <td><?= esc($m->keterangan) ?></td>
                         <?php if (in_groups('admin')): ?>
                         <td>
                             <div class="btn-group" role="group">
                                 <a href="<?= site_url('maintenance/edit/'.$m->id) ?>" class="btn btn-warning btn-sm">Edit</a>
                                 <a href="<?= site_url('maintenance/delete/'.$m->id) ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin hapus?')">Hapus</a>
+                                <?php if ($m->pengingat == 1): ?>
+                                    <a href="<?= site_url('maintenance/selesai/'.$m->id) ?>" 
+                                    class="btn btn-success btn-sm"
+                                    onclick="return confirm('Tandai selesai dan matikan pengingat?')">Selesai</a>
+                                <?php endif; ?>
                             </div>
                         </td>
                         <?php endif; ?>

@@ -11,6 +11,28 @@
 
   <!-- Right navbar links -->
   <ul class="navbar-nav ml-auto">
+    <!-- Reminder Notifications -->
+    <li class="nav-item dropdown">
+      <a class="nav-link" data-toggle="dropdown" href="#">
+          <i class="far fa-bell"></i>
+          <span class="badge badge-danger navbar-badge">
+              <?= isset($notifikasi) && is_array($notifikasi) ? count($notifikasi) : 0 ?>
+          </span>
+      </a>
+      <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+          <?php if (!empty($notifikasi)): ?>
+              <?php foreach ($notifikasi as $item): ?>
+                  <a href="maintenance" class="dropdown-item"><?= $item->keterangan ?> (<?= $item->unit ?>)  
+                      <small class="text-muted"> <?= date('d-m-Y', strtotime($item->tanggal_pengingat)) ?></small>
+                  </a>
+              <?php endforeach; ?>
+          <?php else: ?>
+              <span class="dropdown-item">Tidak ada notifikasi</span>
+          <?php endif; ?>
+      </div>
+  </li>
+
+
     <!-- User Profile Dropdown -->
     <li class="nav-item dropdown">
       <a class="nav-link" data-toggle="dropdown" href="#">

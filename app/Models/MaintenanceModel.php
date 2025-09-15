@@ -12,16 +12,18 @@ class MaintenanceModel extends Model
     protected $returnType       = 'object';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = [
+    protected $allowedFields = [
         'nama_petugas',
         'nama_barang',
         'kode_barang',
         'kode_unit',
         'unit',
         'tanggal',
-        'pengingat',
-        'hari',
+        'pengingat',          // 0/1
+        'hari',               // jumlah hari
+        'tanggal_pengingat',  // hasil hitung tanggal + hari
         'keterangan',
+        'status',             // Belum / Hari ini / Lewat
     ];
 
     protected bool $allowEmptyInserts = false;
