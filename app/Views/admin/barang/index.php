@@ -5,7 +5,9 @@
     <div class="card-header">
         <h3 class="card-title">Daftar Barang</h3>
         <div class="card-tools">
+        <?php if (in_groups('admin')): ?>
             <a href="<?= site_url('barang/create') ?>" class="btn btn-primary btn-sm">Tambah Barang</a>
+        <?php endif; ?>
         </div>
     </div>
     <div class="card-body">
@@ -22,7 +24,6 @@
                     <th>Kategori</th>
                     <th>Total Unit</th>
                     <th>Total Dipinjam</th>
-                    <th>Keterangan</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -35,7 +36,6 @@
                     <td><?= esc($row['kategori']) ?></td>
                     <td><?= esc($row['total_unit']) ?></td>
                     <td><?= esc($row['total_dipinjam']) ?></td>
-                    <td><?= esc($row['keterangan']) ?></td>
                     <?php if (in_groups('admin')): ?>
                     <td>
                         <div class="btn-group" role="group">

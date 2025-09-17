@@ -63,7 +63,7 @@ class Atk extends BaseController
             'created_at'  => date('Y-m-d H:i:s'),
         ]);
 
-        return redirect()->to('/atk')->with('message', 'ATK / ATRK berhasil ditambahkan');
+        return redirect()->to('/atk')->with('success', 'ATK / ATRK berhasil ditambahkan');
     }
 
     public function edit($id)

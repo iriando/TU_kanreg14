@@ -13,7 +13,7 @@
         <!-- Layanan -->
         <li class="nav-header">Layanan</li>
 
-        <?php if (in_groups(['admin', 'petugas_bmn'])): ?>
+        <?php if (in_groups(['admin', 'petugas BMN'])): ?>
         <li class="nav-item">
           <a href="<?= base_url('peminjaman') ?>" class="nav-link">
             <i class="nav-icon fas fa-handshake"></i>
@@ -53,7 +53,7 @@
 
         <li class="nav-item">
           <a href="<?= base_url('barang') ?>" class="nav-link">
-            <i class="nav-icon fas fa-handshake"></i>
+            <i class="nav-icon fas fa-box"></i>
             <p>Barang Milik Negara</p>
           </a>
         </li>

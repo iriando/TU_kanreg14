@@ -64,7 +64,7 @@ class Obat extends BaseController
             'created_at'  => date('Y-m-d H:i:s'),
         ]);
 
-        return redirect()->to('/obat')->with('message', 'Obat-obatan berhasil ditambahkan');
+        return redirect()->to('/obat')->with('success', 'Obat-obatan berhasil ditambahkan');
     }
 
     public function edit($id)

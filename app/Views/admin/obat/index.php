@@ -10,11 +10,7 @@
             <?php endif; ?>
         </div>
     </div>
-    <?php if(session()->getFlashdata('message')): ?>
-    <div class="card-body table-responsive">
-        <div class="alert alert-success"><?= session()->getFlashdata('message') ?>
-    </div>
-    <?php endif; ?>
+    
 
     <div class="card-body table-responsive">
         <table class="table table-bordered" id="t-obat">
