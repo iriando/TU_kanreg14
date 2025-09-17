@@ -121,6 +121,7 @@ $routes->group('maintenance', ['namespace' => 'App\Controllers'], function($rout
         $routes->get('edit/(:num)', 'Maintenance::edit/$1');
         $routes->post('update/(:num)', 'Maintenance::update/$1');
         $routes->get('delete/(:num)', 'Maintenance::delete/$1');
+        $routes->get('selesai/(:num)', 'Maintenance::selesai/$1');
     });
 });
 
