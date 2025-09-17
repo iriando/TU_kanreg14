@@ -62,17 +62,15 @@ class ReminderUpdate extends BaseCommand
 
         $today = date('Y-m-d H:i:s');
 
-        // Hari ini
         $model->where('pengingat', 1)
-              ->where('DATE(tanggal_pengingat)', $today)
-              ->set('status', 'Hari ini')
-              ->update();
+            ->where('DATE(tanggal_pengingat)', $today)
+            ->set('status', 'Hari ini')
+            ->update();
 
-        // Lewat
         $model->where('pengingat', 1)
-              ->where('DATE(tanggal_pengingat) <', $today)
-              ->set('status', 'Lewat')
-              ->update();
+            ->where('DATE(tanggal_pengingat) <', $today)
+            ->set('status', 'Lewat')
+            ->update();
 
         CLI::write('Status pengingat berhasil diperbarui!', 'green');
     }

@@ -22,10 +22,19 @@ class Dashboard extends BaseController
 
         // hitung total semua yg dipinjam
         $totalDipinjam = array_sum(array_column($barang, 'total_dipinjam'));
+        $notifikasi = $this->maintenanceModel
+            ->where('pengingat', 1) // hanya yg aktif
+            ->where('tanggal_pengingat <=', date('Y-m-d H:i:s'))
+            ->groupStart() // mulai group
+                ->where('status', 'Hari ini')
+                ->orWhere('status', 'Lewat')
+            ->groupEnd()   // tutup group
+            ->findAll();
 
         $data = [
             'title'         => 'Dashboard',
             'totalDipinjam' => $totalDipinjam,
+            'notif' => $notifikasi,
         ];
 
         return view('dashboard', $data);

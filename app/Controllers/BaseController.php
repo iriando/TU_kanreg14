@@ -67,8 +67,6 @@ abstract class BaseController extends Controller
                 ->orWhere('status', 'Lewat')
             ->groupEnd()   // tutup group
             ->findAll();
-        // dd($notifikasi);
-        // die;
         Services::renderer()->setVar('notifikasi', $notifikasi);
 
         // Preload any models, libraries, etc, here.

@@ -23,7 +23,7 @@
           <?php if (!empty($notifikasi)): ?>
               <?php foreach ($notifikasi as $item): ?>
                   <a href="maintenance" class="dropdown-item"><?= $item->keterangan ?> (<?= $item->unit ?>)  
-                      <small class="text-muted"> <?= date('d-m-Y', strtotime($item->tanggal_pengingat)) ?></small>
+                      <small class="text-danger"> <?= date('d-m-Y', strtotime($item->tanggal_pengingat)) ?></small>
                   </a>
               <?php endforeach; ?>
           <?php else: ?>

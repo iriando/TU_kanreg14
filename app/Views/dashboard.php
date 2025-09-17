@@ -18,22 +18,22 @@
               <div class="icon">
                 <i class="ion ion-arrow-swap"></i>
               </div>
-              <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              <a href="<?= site_url('peminjaman') ?>" class="small-box-footer">Info lebih lanjut <i class="fas fa-arrow-circle-right"></i></a>
             </div>
           </div>
           <!-- ./col -->
           <div class="col-lg-3 col-6">
             <!-- small box -->
-            <div class="small-box bg-success">
+            <div class="small-box bg-danger">
               <div class="inner">
-                <h3>0</h3>
+                <h3><?= count($notifikasi) ?></h3>
 
-                <p>Pemeliharaan</p>
+                <p>Notif Maintenance</p>
               </div>
               <div class="icon">
                 <i class="ion ion-ios-bell"></i>
               </div>
-              <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              <a href="<?= site_url('maintenance') ?>" class="small-box-footer">Info lebih lanjut <i class="fas fa-arrow-circle-right"></i></a>
             </div>
           </div>
           
