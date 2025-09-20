@@ -36,6 +36,16 @@ $routes->group('usermanager', [
     $routes->get('users/delete/(:num)', 'UserManager::delete/$1');
 });
 
+$routes->group('template', [
+    'namespace' => 'App\Controllers',
+    'filter'    => 'role:admin'
+], function($routes) {
+    $routes->get('/', 'TemplateManager::index');
+    $routes->get('create', 'TemplateManager::create');
+    $routes->post('store', 'TemplateManager::store');
+    $routes->get('delete/(:num)', 'TemplateManager::delete/$1');
+});
+
 $routes->group('peminjaman', ['namespace' => 'App\Controllers'], function($routes) {
     $routes->get('/', 'Peminjaman::index');
     $routes->get('create', 'Peminjaman::create');

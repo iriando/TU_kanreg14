@@ -190,7 +190,7 @@ class Peminjaman extends BaseController
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }
 
-        $unitModel = new BarangUnitModel();
+        $unitModel   = new BarangUnitModel();
         $masterModel = new BarangMasterModel();
 
         // ambil data master barang
@@ -201,9 +201,22 @@ class Peminjaman extends BaseController
             ->where('status', 'dipinjam')
             ->findAll();
 
-        $templateProcessor = new TemplateProcessor(WRITEPATH . '../app/Templates/BAST-template.docx');
+        // ambil template dari database (default "BAST-peminjaman")
+        $templateModel = new \App\Models\TemplateModel();
+        $template      = $templateModel->where('nama', 'BAST-peminjaman')->first();
 
-        // isi placeholder utama (contoh, silakan sesuaikan)
+        if (!$template) {
+            return redirect()->back()->with('error', 'Template BAST-peminjaman belum tersedia');
+        }
+
+        $templatePath = FCPATH . $template->file_path; // karena waktu upload kita simpan "templates/nama.docx"
+        if (!file_exists($templatePath)) {
+            return redirect()->back()->with('error', 'File template tidak ditemukan di server');
+        }
+
+        $templateProcessor = new TemplateProcessor($templatePath);
+
+        // isi placeholder utama
         $templateProcessor->setValue('nomor', $this->request->getPost('nomor'));
         $templateProcessor->setValue('tanggal', date('d-m-Y', strtotime($this->request->getPost('tanggal'))));
         $templateProcessor->setValue('peminjam_nama', $this->request->getPost('peminjam_nama'));
@@ -231,7 +244,7 @@ class Peminjaman extends BaseController
             }
         }
 
-        $filename = 'BAST_' . $peminjaman->id. '.docx';
+        $filename = 'BAST_' . $peminjaman->id . '.docx';
 
         // output ke browser
         header("Content-Description: File Transfer");
@@ -240,6 +253,4 @@ class Peminjaman extends BaseController
         $templateProcessor->saveAs("php://output");
         exit;
     }
-
-
 }
