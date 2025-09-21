@@ -13,7 +13,6 @@ $routes->group('', ['filter' => 'login'], function($routes) {
     $routes->get('dashboard', 'Dashboard::index');
 });
 
-
 $routes->group('', ['namespace' => 'Myth\Auth\Controllers'], function ($routes) {
     $routes->get('login', 'AuthController::login', ['as' => 'login']);
     $routes->post('login', 'AuthController::attemptLogin');
@@ -134,6 +133,29 @@ $routes->group('maintenance', ['namespace' => 'App\Controllers'], function($rout
         $routes->get('selesai/(:num)', 'Maintenance::selesai/$1');
     });
 });
+
+$routes->group('pegawai', ['namespace' => 'App\Controllers'], function($routes) {
+    $routes->get('/', 'Pegawai::index');
+    $routes->group('', ['filter' => 'role:admin'], function($routes) {
+        $routes->get('create', 'Pegawai::create');
+        $routes->post('store', 'Pegawai::store');
+        $routes->get('edit/(:num)', 'Pegawai::edit/$1');
+        $routes->post('update/(:num)', 'Pegawai::update/$1');
+        $routes->get('delete/(:num)', 'Pegawai::delete/$1');
+    });
+});
+
+$routes->group('logpegawai', ['namespace' => 'App\Controllers'], function($routes) {
+    $routes->get('/', 'LogPegawai::index');
+    $routes->group('', ['filter' => 'role:admin'], function($routes) {
+        $routes->get('logbaru', 'LogPegawai::logBaru');
+        $routes->post('store', 'LogPegawai::storePerPegawai');
+        $routes->get('edit/(:num)', 'LogPegawai::edit/$1');
+        $routes->post('update/(:num)', 'LogPegawai::updatePerPegawai/$1');
+        $routes->get('delete/(:num)', 'LogPegawai::delete/$1');
+    });
+});
+
 
 
 

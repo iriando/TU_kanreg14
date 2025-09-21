@@ -46,6 +46,13 @@
           </a>
         </li>
         <?php endif; ?>
+        
+        <li class="nav-item">
+          <a href="<?= base_url('logpegawai') ?>" class="nav-link">
+            <i class="nav-icon fas fa-running"></i>
+            <p>Log Pegawai</p>
+          </a>
+        </li>
 
         <!-- Barang Milik Negara -->
         <?php if (in_groups(['admin'])): ?>
@@ -53,7 +60,7 @@
 
         <li class="nav-item">
           <a href="<?= base_url('barang') ?>" class="nav-link">
-            <i class="nav-icon fas fa-box"></i>
+            <i class="nav-icon fas fa-boxes"></i>
             <p>Barang Milik Negara</p>
           </a>
         </li>
@@ -87,6 +94,12 @@
           <a href="<?= site_url('template') ?>" class="nav-link">
             <i class="nav-icon fas fa-file"></i>
             <p>Template Manager</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="<?= base_url('pegawai') ?>" class="nav-link">
+            <i class="nav-icon fas fa-child"></i>
+            <p>Pegawai</p>
           </a>
         </li>
         <?php endif; ?>
