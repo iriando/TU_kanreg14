@@ -150,9 +150,8 @@ $routes->group('logpegawai', ['namespace' => 'App\Controllers'], function($route
     $routes->group('', ['filter' => 'role:admin'], function($routes) {
         $routes->get('logbaru', 'LogPegawai::logBaru');
         $routes->post('store', 'LogPegawai::storePerPegawai');
-        $routes->get('edit/(:num)', 'LogPegawai::edit/$1');
         $routes->post('update/(:num)', 'LogPegawai::updatePerPegawai/$1');
-        $routes->get('delete/(:num)', 'LogPegawai::delete/$1');
+        $routes->get('batal/(:segment)', 'LogPegawai::batal/$1');
     });
 });
 

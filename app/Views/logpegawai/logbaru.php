@@ -29,12 +29,10 @@
                 <td><?= $i+1 ?></td>
                 <td><?= $log['nama'] ?></td>
                 <td>
-                <input type="time" name="waktu_masuk" 
-                        value="<?= $log['waktu_masuk'] ? date('H:i', strtotime($log['waktu_masuk'])) : '' ?>" 
-                        class="form-control">
+                    <input type="time" name="waktu_masuk" value="<?= $log['waktu_masuk'] ? date('H:i', strtotime($log['waktu_masuk'])) : '' ?>" class="form-control">
                 </td>
                 <td>
-                <input type="time" name="waktu_keluar" 
+                    <input type="time" name="waktu_keluar" 
                         value="<?= $log['waktu_keluar'] ? date('H:i', strtotime($log['waktu_keluar'])) : '' ?>" 
                         class="form-control">
                 </td>
@@ -56,6 +54,13 @@
             <?php endforeach; ?>
         </tbody>
         </table>
+    </div>
+    <div class="card-footer">
+        <?php if (in_groups('admin')): ?>
+        <a href="<?= base_url('logpegawai/batal/'.$tanggal) ?>" class="btn btn-danger" onclick="return confirm('Yakin batal membuat log untuk tanggal ini?')">Batal</a>
+        <?php endif ?>
+        <!-- Tombol Selesai -->
+        <a href="<?= base_url('logpegawai') ?>" class="btn btn-success">Selesai</a>
     </div>
 </div>
 

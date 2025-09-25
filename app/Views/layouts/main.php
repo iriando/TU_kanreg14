@@ -34,7 +34,7 @@
 
   <!-- Footer -->
   <footer class="main-footer text-center">
-      <strong>&copy; <?= date('Y') ?> - Aplikasi Asset BMN</strong>
+      <strong>&copy; <?= date('Y') ?> - Bagian Tata Usaha Kanreg XIV BKN</strong>
   </footer>
 </div>
 

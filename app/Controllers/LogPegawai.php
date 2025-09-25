@@ -113,4 +113,9 @@ class LogPegawai extends BaseController
         return $tanggal . ' ' . $waktu . ':00'; // format yyyy-mm-dd HH:MM:SS
     }
 
+    public function batal($tanggal)
+    {
+        $this->logModel->where('tanggal', $tanggal)->delete();
+        return redirect()->to(base_url('logpegawai'))->with('success', 'Log tanggal '.$tanggal.' dibatalkan.');
+    }
 }

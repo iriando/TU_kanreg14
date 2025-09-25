@@ -54,10 +54,17 @@
           </a>
         </li>
 
-        <!-- Barang Milik Negara -->
+        <!-- Asset -->
         <?php if (in_groups(['admin'])): ?>
-        <li class="nav-header">Barang</li>
+        <li class="nav-header">Aset</li>
 
+        <li class="nav-item">
+          <a href="<?= base_url('pegawai') ?>" class="nav-link">
+            <i class="nav-icon fas fa-child"></i>
+            <p>Pegawai</p>
+          </a>
+        </li>
+        
         <li class="nav-item">
           <a href="<?= base_url('barang') ?>" class="nav-link">
             <i class="nav-icon fas fa-boxes"></i>
@@ -94,12 +101,6 @@
           <a href="<?= site_url('template') ?>" class="nav-link">
             <i class="nav-icon fas fa-file"></i>
             <p>Template Manager</p>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="<?= base_url('pegawai') ?>" class="nav-link">
-            <i class="nav-icon fas fa-child"></i>
-            <p>Pegawai</p>
           </a>
         </li>
         <?php endif; ?>

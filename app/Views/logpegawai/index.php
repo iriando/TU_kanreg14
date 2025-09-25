@@ -14,7 +14,7 @@
         <h3 class="card-title">Log Keluar/Masuk Pegawai</h3>
         <div class="card-tools">
             <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#modalTanggal">
-              <i class="fas fa-plus"></i> Buat Log Baru
+              <i class="fas fa-plus"></i> Buat Log
             </button>
         </div>
       </div>
@@ -49,7 +49,6 @@
               <th>Pulang</th>
               <th>Status</th>
               <th>Keterangan</th>
-              <th>Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -64,10 +63,6 @@
                 <td><?= $log['waktu_pulang'] ? date('H:i', strtotime($log['waktu_pulang'])) : '-' ?></td>
                 <td><?= $log['status'] ?></td>
                 <td><?= $log['keterangan'] ?></td>
-                <td>
-                  <a href="<?= base_url('log_pegawai/edit/'.$log['id']) ?>" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
-                  <a href="<?= base_url('log_pegawai/delete/'.$log['id']) ?>" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></a>
-                </td>
               </tr>
             <?php endforeach; ?>
           </tbody>
