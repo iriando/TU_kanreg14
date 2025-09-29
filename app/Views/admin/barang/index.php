@@ -75,6 +75,64 @@ $(document).ready(function () {
     let table = $('#tabelBarang').DataTable({
         responsive: true,
         ordering: true,
+        scrollX: true,
+        lengthChange: false,
+        autoWidth: false,
+        dom: 'Bfrtip',
+        buttons: [
+            {
+                extend: 'colvis',
+                text: '<i class="fas fa-eye"></i> Colvis',
+            },
+            {
+                extend: 'excel',
+                text: '<i class="fas fa-file-excel"></i> Excel',
+                className: 'btn btn-success btn-sm',
+                exportOptions: {
+                    columns: ':visible',
+                    format: {
+                        body: function (data, row, column, node) {
+                            if (column === 0) {
+                                return row + 1;
+                            }
+                            return data;
+                        }
+                    }
+                }
+            },
+            {
+                extend: 'pdf',
+                text: '<i class="fas fa-file-pdf"></i> PDF',
+                className: 'btn btn-danger btn-sm',
+                exportOptions: {
+                    columns: ':visible',
+                    format: {
+                        body: function (data, row, column, node) {
+                            if (column === 0) {
+                                return row + 1;
+                            }
+                            return data;
+                        }
+                    }
+                }
+            },
+            {
+                extend: 'print',
+                text: '<i class="fas fa-print"></i> Print',
+                className: 'btn btn-info btn-sm',
+                exportOptions: {
+                    columns: ':visible',
+                    format: {
+                        body: function (data, row, column, node) {
+                            if (column === 0) {
+                                return row + 1;
+                            }
+                            return data;
+                        }
+                    }
+                }
+            }
+        ],
         columnDefs: [
             { orderable: false, targets: [0, -1] } // kolom nomor & aksi tidak bisa diurutkan
         ]

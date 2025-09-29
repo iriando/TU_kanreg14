@@ -26,8 +26,8 @@ class CreatedLogPegawaiTables extends Migration
             'waktu_pulang'  => ['type' => 'DATETIME', 'null' => true],
             'status'        => [
                 'type' => 'ENUM',
-                'constraint' => ['hadir', 'izin', 'cuti', 'dinas luar'],
-                'default'    => 'hadir',
+                'constraint' => ['tidak hadir', 'hadir', 'izin', 'cuti', 'dinas luar'],
+                'default'    => 'tidak hadir',
             ],
             'keterangan'    => ['type' => 'VARCHAR', 'constraint' => 255, 'null' => true],
             'created_at'    => ['type' => 'DATETIME', 'null' => true],

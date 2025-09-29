@@ -2,8 +2,12 @@
 <?= $this->section('content') ?>
 
 <div class="container-fluid">
-  <h1>Dashboard SIMAPAN</h1>
-  <h4>Selamat datang di aplikasi Sistem Informasi Manajemen Asset & Persediaan.</h4>
+  <h1>Dashboard</h1>
+</div>
+
+<div class="callout callout-info">
+  <h5>Selamat Datang!</h5>
+  <p>di aplikasi Sistem Informasi Manajemen Perkantoran.</p>
 </div>
 
         <div class="row">

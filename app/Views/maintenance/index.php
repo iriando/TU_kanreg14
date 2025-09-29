@@ -128,9 +128,6 @@
         ]
     });
 
-    // tombol ke posisi adminlte default
-    table.buttons().container().appendTo('#distribusi-obat_wrapper .col-md-6:eq(0)');
-
     // auto numbering di tabel (untuk tampilan web)
     table.on('order.dt search.dt draw.dt', function () {
         let i = 1;

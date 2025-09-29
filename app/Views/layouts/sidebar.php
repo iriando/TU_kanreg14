@@ -2,6 +2,7 @@
   <!-- Brand Logo -->
   <a href="<?= base_url('/') ?>" class="brand-link">
     <span class="brand-text font-weight-light">SIMAPAN</span>
+    <span class="badge badge-danger navbar-badge">Beta</span>
   </a>
 
   <!-- Sidebar -->

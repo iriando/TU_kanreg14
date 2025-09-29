@@ -40,7 +40,7 @@
         <table id="logTable" class="table table-bordered table-striped">
           <thead>
             <tr>
-              <th>#</th>
+              <th>No. </th>
               <th>Pegawai</th>
               <th>Tanggal</th>
               <th>Masuk</th>
@@ -103,18 +103,81 @@
   $(document).ready(function() {
       var table = $('#logTable').DataTable({
           responsive: true,
-          autoWidth: false
+          autoWidth: false,
+          dom: 'Bfrtip', // butuh ini untuk tombol export
+          buttons: [
+              {
+                  extend: 'excel',
+                  text: '<i class="fas fa-file-excel"></i> Excel',
+                  className: 'btn btn-success btn-sm',
+                  exportOptions: {
+                      columns: ':visible',
+                      format: {
+                          body: function (data, row, column, node) {
+                              // Kolom No ada di index 0
+                              if (column === 0) {
+                                  return row + 1; // isi manual nomor urut
+                              }
+                              return data;
+                          }
+                      }
+                  }
+              },
+              {
+                  extend: 'pdf',
+                  text: '<i class="fas fa-file-pdf"></i> PDF',
+                  className: 'btn btn-danger btn-sm',
+                  exportOptions: {
+                      columns: ':visible',
+                      format: {
+                          body: function (data, row, column, node) {
+                              if (column === 0) {
+                                  return row + 1;
+                              }
+                              return data;
+                          }
+                      }
+                  }
+              },
+              {
+                  extend: 'print',
+                  text: '<i class="fas fa-print"></i> Print',
+                  className: 'btn btn-info btn-sm',
+                  exportOptions: {
+                      columns: ':visible',
+                      format: {
+                          body: function (data, row, column, node) {
+                              if (column === 0) {
+                                  return row + 1;
+                              }
+                              return data;
+                          }
+                      }
+                  }
+              }
+          ],
+          columnDefs: [
+              { orderable: false, targets: 0 } // kolom No tidak ikut sorting
+          ],
+          order: [[2, 'asc']], // default urut berdasarkan Tanggal
+          drawCallback: function(settings) {
+              var api = this.api();
+              api.column(0, {search:'applied', order:'applied'}).nodes().each(function(cell, i) {
+                  cell.innerHTML = i + 1; // autonumber tiap draw
+              });
+          }
       });
 
       // Filter Pegawai
       $('#filterPegawai').on('change', function() {
-          table.column(1).search(this.value).draw(); // kolom ke-1 = Pegawai
+          table.column(1).search(this.value).draw();
       });
 
       // Filter Tanggal
       $('#filterTanggal').on('change', function() {
-          table.column(2).search(this.value).draw(); // kolom ke-2 = Tanggal
+          table.column(2).search(this.value).draw();
       });
   });
+
 </script>
 <?= $this->endSection() ?>

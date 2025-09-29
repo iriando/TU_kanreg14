@@ -62,6 +62,7 @@
         scrollX: true,
         lengthChange: false,
         autoWidth: false,
+        dom: 'Bfrtip',
         buttons: [
             {
                 extend: 'colvis',

@@ -57,9 +57,8 @@
     </div>
     <div class="card-footer">
         <?php if (in_groups('admin')): ?>
-        <a href="<?= base_url('logpegawai/batal/'.$tanggal) ?>" class="btn btn-danger" onclick="return confirm('Yakin batal membuat log untuk tanggal ini?')">Batal</a>
+        <a href="<?= base_url('logpegawai/batal/'.$tanggal) ?>" class="btn btn-danger" onclick="return confirm('Yakin batal membuat log untuk tanggal ini?')">Batal/Hapus semua</a>
         <?php endif ?>
-        <!-- Tombol Selesai -->
         <a href="<?= base_url('logpegawai') ?>" class="btn btn-success">Selesai</a>
     </div>
 </div>
