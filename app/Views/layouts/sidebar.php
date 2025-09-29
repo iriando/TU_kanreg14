@@ -2,7 +2,6 @@
   <!-- Brand Logo -->
   <a href="<?= base_url('/') ?>" class="brand-link">
     <span class="brand-text font-weight-light">SIMAPAN</span>
-    <span class="badge badge-danger navbar-badge">Beta</span>
   </a>
 
   <!-- Sidebar -->
@@ -52,11 +51,12 @@
           <a href="<?= base_url('logpegawai') ?>" class="nav-link">
             <i class="nav-icon fas fa-running"></i>
             <p>Log Pegawai</p>
+            <span class="badge badge-danger navbar-badge">Beta</span>
           </a>
         </li>
 
         <!-- Asset -->
-        <?php if (in_groups(['admin'])): ?>
+        <?php if (in_groups(['admin', 'petugas BMN'])): ?>
         <li class="nav-header">Aset</li>
 
         <li class="nav-item">
