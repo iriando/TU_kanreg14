@@ -5,10 +5,6 @@
     <h3>User Manager</h3>
     <a href="<?= site_url('usermanager/users/create') ?>" class="btn btn-primary mb-3">Tambah User</a>
 
-    <?php if(session()->getFlashdata('message')): ?>
-        <div class="alert alert-success"><?= session()->getFlashdata('message') ?></div>
-    <?php endif; ?>
-
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -32,4 +28,24 @@
     </table>
 </div>
 
+<?= $this->endSection() ?>
+
+<?= $this->section('scripts') ?>
+<script>
+    <?php if (session()->getFlashdata('success')): ?>
+    toastr.success("<?= session()->getFlashdata('success') ?>");
+    <?php endif; ?>
+
+    <?php if (session()->getFlashdata('error')): ?>
+        toastr.error("<?= session()->getFlashdata('error') ?>");
+    <?php endif; ?>
+
+    <?php if (session()->getFlashdata('warning')): ?>
+        toastr.warning("<?= session()->getFlashdata('warning') ?>");
+    <?php endif; ?>
+
+    <?php if (session()->getFlashdata('info')): ?>
+        toastr.info("<?= session()->getFlashdata('info') ?>");
+    <?php endif; ?>
+</script>
 <?= $this->endSection() ?>

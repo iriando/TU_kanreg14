@@ -122,7 +122,10 @@ class UserManager extends BaseController
             $dataUser['email'] = $this->request->getPost('email');
         }
         if ($this->request->getPost('password')) {
-            $dataUser['password'] = $this->request->getPost('password'); // otomatis hash
+            $userEntity = new User();
+            $userEntity->id = $id;
+            $userEntity->password = $this->request->getPost('password');
+            $this->userModel->save($userEntity);
         }
 
         if (!empty($dataUser)) {
@@ -137,7 +140,7 @@ class UserManager extends BaseController
             'group_id' => $roleId
         ]);
 
-        return redirect()->to('/usermanager/users')->with('message', 'User berhasil diupdate');
+        return redirect()->to('/usermanager/users')->with('success', 'User berhasil diupdate');
     }
 
 
@@ -147,6 +150,6 @@ class UserManager extends BaseController
         $this->db->table('users')->where('id', $id)->delete();
         // $this->userModel->delete($id);
 
-        return redirect()->to('/usermanager/users')->with('message', 'User berhasil dihapus');
+        return redirect()->to('/usermanager/users')->with('danger', 'User berhasil dihapus');
     }
 }
