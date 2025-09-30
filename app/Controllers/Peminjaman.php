@@ -85,13 +85,20 @@ class Peminjaman extends BaseController
     public function kembalikan()
     {
         $unitKembali  = $this->request->getPost('unit_kembali');
-        $id           = $this->request->getPost('id'); // id peminjaman induk
+        $id           = $this->request->getPost('id');
         $data         = $this->peminjamanModel->find($id);
-        $jumlahUnit   = count($unitKembali);
+        $jumlahUnit   = $unitKembali ? count($unitKembali) : 0;
         $petugas      = user()->username;
         $tanggal_kembali = $this->request->getPost('tanggal_kembali');
 
         if (!empty($unitKembali) && $data) {
+
+            if (strtotime($tanggal_kembali) < strtotime($data->tanggal_pinjam)) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Tanggal kembali tidak boleh lebih awal dari tanggal pinjam!');
+            }
+
             // Update status unit jadi tersedia
             $this->unitModel->setTersedia($unitKembali);
 
@@ -112,6 +119,8 @@ class Peminjaman extends BaseController
 
         return redirect()->to('/peminjaman')->with('success', 'Barang berhasil dikembalikan');
     }
+
+
 
 
     public function getUnitDipinjam()
@@ -146,21 +155,33 @@ class Peminjaman extends BaseController
         $peminjaman = $this->peminjamanModel->find($id);
 
         if (!$peminjaman) {
-            throw new \CodeIgniter\Exceptions\PageNotFoundException('Peminjaman tidak ditemukan');
+            return redirect()->to('/peminjaman')->with('error', 'Data tidak ditemukan');
         }
 
-        $kodeBarang   = $this->request->getPost('kode_barang');
-        $barang       = $this->barangModel->where('kode_barang', $kodeBarang)->first();
-
         $data = [
-            'nama_peminjam'   => $this->request->getPost('nama_peminjam'),
-            'tanggal_pinjam'  => $this->request->getPost('tanggal_pinjam'),
+            'nama_peminjam' => $this->request->getPost('nama_peminjam'),
+            'tanggal_pinjam' => $this->request->getPost('tanggal_pinjam'),
         ];
+
+        // Jika status = dikembalikan, update juga tanggal_kembali
+        if ($peminjaman->status === 'dikembalikan') {
+            $tanggal_kembali = $this->request->getPost('tanggal_kembali');
+
+            // ✅ validasi: tanggal kembali >= tanggal pinjam
+            if (strtotime($tanggal_kembali) < strtotime($data['tanggal_pinjam'])) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Tanggal kembali tidak boleh lebih awal dari tanggal pinjam!');
+            }
+
+            $data['tanggal_kembali'] = $tanggal_kembali;
+        }
 
         $this->peminjamanModel->update($id, $data);
 
-        return redirect()->to('/peminjaman')->with('success', 'Data peminjaman berhasil diperbarui');
+        return redirect()->to('/peminjaman')->with('success', 'Data berhasil diupdate');
     }
+
 
 
     public function delete($id)
