@@ -122,15 +122,17 @@ class Barang extends Controller
     public function storeUnit($kode_barang)
     {
         $barang = $this->barangMaster->where('kode_barang', $kode_barang)->first();
+        $kode_unit = $this->request->getPost('kode_unit');
         if (!$barang) {
             return redirect()->to('/barang')->with('error', 'Barang tidak ditemukan.');
         }
         $data = [
             'kode_barang' => $kode_barang,
-            'kode_unit'   => $this->request->getPost('kode_unit'),
+            'kode_unit'   => $kode_unit,
             'merk'        => $this->request->getPost('merk'),
             'status'      => $this->request->getPost('status'),
             'kondisi'     => $this->request->getPost('kondisi'),
+            'slug'        => strtolower($kode_barang . '-' . $kode_unit),
         ];
         if ($this->barangUnit->insert($data)) {
             return redirect()->to('/barang/detail/' . $kode_barang)
@@ -153,16 +155,18 @@ class Barang extends Controller
     public function updateUnit($id)
     {
         $unit = $this->barangUnit->find($id);
+        $kode_unit = $this->request->getPost('kode_unit');
 
         if (!$unit) {
             return redirect()->to('/barang')->with('error', 'Unit tidak ditemukan.');
         }
 
         $data = [
-            'kode_unit' => $this->request->getPost('kode_unit'),
+            'kode_unit' => $kode_unit,
             'merk'      => $this->request->getPost('merk'),
             'status'    => $this->request->getPost('status'),
             'kondisi'   => $this->request->getPost('kondisi'),
+            'slug'      => strtolower($unit['kode_barang'] . '-' . $kode_unit),
         ];
 
         if ($this->barangUnit->update($id, $data)) {

@@ -5,7 +5,6 @@ namespace App\Controllers;
 use App\Models\BarangUnitModel;
 use App\Models\BarangMasterModel;
 use App\Controllers\BaseController;
-use CodeIgniter\HTTP\ResponseInterface;
 
 class Unit extends BaseController
 {
@@ -18,17 +17,47 @@ class Unit extends BaseController
         $this->barangUnit   = new BarangUnitModel();
     }
     
-    public function index($kode_barang)
+    public function view($id)
     {
-        $barangMaster = $this->barangMaster->where('kode_barang', $kode_barang)->first();
-        if (!$barangMaster) {
-            return redirect()->to('/barang')->with('error', 'Barang tidak ditemukan');
+        // Ambil data unit berdasarkan ID
+        $unit = $this->barangUnit->where('slug', $id)->first();
+        if (!$unit) {
+            throw new \CodeIgniter\Exceptions\PageNotFoundException('Unit tidak ditemukan.');
         }
-        $units = $this->barangUnit->getByKodeBarang($kode_barang);
-        $data = [
-            'barang' => $barangMaster,
-            'units'  => $units
-        ];
-        return view('admin/barang/view_unit', $data);
+
+        // Ambil data barang dari kode_barang
+        $barang = $this->barangMaster
+            ->where('kode_barang', $unit['kode_barang'])
+            ->first();
+
+        // Model log
+        $logPemeliharaanModel = new \App\Models\MaintenanceModel();
+        $logPeminjamanDetailModel = new \App\Models\PeminjamanDetailModel();
+
+        // Ambil log berdasarkan kode_barang (karena tidak ada kolom kode_unit)
+        $log_pemeliharaan = $logPemeliharaanModel
+            ->where('kode_barang', $unit['kode_barang'])
+            ->orderBy('tanggal', 'DESC')
+            ->findAll();
+
+        $log_peminjaman = $logPeminjamanDetailModel
+            ->select('
+                log_peminjaman_detail.*,
+                log_peminjaman.nama_peminjam,
+                log_peminjaman.petugas_pinjam,
+                log_peminjaman.petugas_kembalikan
+            ')
+            ->join('log_peminjaman', 'log_peminjaman.id = log_peminjaman_detail.peminjaman_id')
+            ->where('log_peminjaman_detail.kode_unit', $unit['kode_unit'])
+            ->orderBy('log_peminjaman_detail.tanggal_pinjam', 'DESC')
+            ->findAll();
+
+        // Kirim data ke view
+        return view('admin/barang/view_unit', [
+            'unit' => $unit,
+            'barang' => $barang,
+            'log_pemeliharaan' => $log_pemeliharaan,
+            'log_peminjaman' => $log_peminjaman,
+        ]);
     }
 }

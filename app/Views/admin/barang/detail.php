@@ -56,7 +56,7 @@
                             <td><?= esc($unit['created_at']) ?></td>
                             <td><?= esc($unit['updated_at']) ?></td>
                             <td>
-                                <a href="<?= site_url('barang/view-unit/'.$unit['id']) ?>" 
+                                <a href="<?= site_url('barang/view-unit/'.$unit['slug']) ?>" 
                                 class="btn btn-info btn-sm">Lihat</a>
                                 <a href="<?= site_url('barang/edit-unit/'.$unit['id']) ?>" 
                                 class="btn btn-warning btn-sm">Edit</a>

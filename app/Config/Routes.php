@@ -72,12 +72,13 @@ $routes->group('barang', ['namespace' => 'App\Controllers'], function($routes) {
         $routes->get('detail/(:segment)', 'Barang::detail/$1');
         $routes->get('create-unit/(:segment)', 'Barang::createUnit/$1');
         $routes->post('store-unit/(:segment)', 'Barang::StoreUnit/$1');
-        $routes->get('view-unit/(:num)', 'Unit::index/$1');
         $routes->get('edit-unit/(:num)', 'Barang::editUnit/$1');
         $routes->post('update-unit/(:num)', 'Barang::updateUnit/$1');
         $routes->get('delete-unit/(:num)', 'Barang::deleteUnit/$1');
     });
 });
+
+$routes->get('barang/view-unit/(:segment)', 'Unit::view/$1');
 
 $routes->group('distribusiatk', ['namespace' => 'App\Controllers'], function($routes) {
     $routes->get('/', 'DistribusiAtk::index');

@@ -18,6 +18,7 @@ class BarangUnitModel extends Model
         'merk',
         'status',
         'kondisi',
+        'slug',
     ];
 
     protected bool $allowEmptyInserts = false;
@@ -69,11 +70,12 @@ class BarangUnitModel extends Model
                     ->update();
     }
 
-    public function setTersedia(array $ids)
+    public function setTersedia($kodeUnits)
     {
-        return $this->whereIn('id', $ids)
-                    ->set(['status' => 'tersedia'])
-                    ->update();
+        if (empty($kodeUnits)) return;
+        $this->whereIn('kode_unit', $kodeUnits)
+            ->set(['status' => 'tersedia'])
+            ->update();
     }
 
     public function getByStatus($kodeBarang, $status)
@@ -81,5 +83,22 @@ class BarangUnitModel extends Model
         return $this->where('kode_barang', $kodeBarang)
                     ->where('status', $status)
                     ->findAll();
+    }
+
+    protected function generateSlug(array $data)
+    {
+        if (isset($data['data']['kode_barang']) && isset($data['data']['kode_unit'])) {
+            helper('text');
+
+            $slug = url_title(
+                strtolower($data['data']['kode_barang'] . '-' . $data['data']['kode_unit']),
+                '-', 
+                true
+            );
+
+            $data['data']['slug'] = $slug;
+        }
+
+        return $data;
     }
 }
