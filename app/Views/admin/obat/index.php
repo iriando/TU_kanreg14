@@ -10,8 +10,6 @@
             <?php endif; ?>
         </div>
     </div>
-    
-
     <div class="card-body table-responsive">
         <table class="table table-bordered" id="t-obat">
             <thead>

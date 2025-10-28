@@ -11,10 +11,6 @@
         </div>
     </div>
     <div class="card-body">
-        <?php if (session()->getFlashdata('success')): ?>
-            <div class="alert alert-success"><?= session()->getFlashdata('success') ?></div>
-        <?php endif; ?>
-
         <table id='tabelBarang' class="table table-bordered">
             <thead>
                 <tr>
