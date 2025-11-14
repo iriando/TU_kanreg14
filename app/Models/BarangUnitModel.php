@@ -18,6 +18,7 @@ class BarangUnitModel extends Model
         'merk',
         'status',
         'kondisi',
+        'keterangan',
         'slug',
     ];
 

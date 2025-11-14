@@ -39,6 +39,7 @@
                     <th>Merk</th>
                     <th>Status</th>
                     <th>Kondisi</th>
+                    <th>Keterangan</th>
                     <th>Tanggal Dibuat</th>
                     <th>Tanggal Update</th>
                     <th>Aksi</th>
@@ -53,6 +54,7 @@
                             <td><?= esc($unit['merk']) ?></td>
                             <td><?= esc($unit['status']) ?></td>
                             <td><?= esc($unit['kondisi']) ?></td>
+                            <td><?= esc($unit['keterangan']) ?></td>
                             <td><?= esc($unit['created_at']) ?></td>
                             <td><?= esc($unit['updated_at']) ?></td>
                             <td>

@@ -37,6 +37,11 @@
                 </select>
             </div>
 
+            <div class="form-group">
+                <label>Keterangan</label>
+                <textarea name="keterangan" class="form-control"></textarea>
+            </div>
+
             <button type="submit" class="btn btn-primary">Simpan</button>
         </form>
     </div>

@@ -33,6 +33,12 @@
                     <option value="rusak">Rusak</option>
                 </select>
             </div>
+
+            <div class="mb-3">
+                <label for="keterangan">Keterangan</label>
+                <textarea name="keterangan" id="keterangan" class="form-control"><?= esc($unit['keterangan']) ?></textarea>
+            </div>
+
             <button type="submit" class="btn btn-success">Update</button>
         </form>
     </div>

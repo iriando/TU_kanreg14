@@ -132,6 +132,7 @@ class Barang extends Controller
             'merk'        => $this->request->getPost('merk'),
             'status'      => $this->request->getPost('status'),
             'kondisi'     => $this->request->getPost('kondisi'),
+            'keterangan'  => $this->request->getPost('keterangan'),
             'slug'        => strtolower($kode_barang . '-' . $kode_unit),
         ];
         if ($this->barangUnit->insert($data)) {
@@ -166,6 +167,7 @@ class Barang extends Controller
             'merk'      => $this->request->getPost('merk'),
             'status'    => $this->request->getPost('status'),
             'kondisi'   => $this->request->getPost('kondisi'),
+            'keterangan'  => $this->request->getPost('keterangan'),
             'slug'      => strtolower($unit['kode_barang'] . '-' . $kode_unit),
         ];
 
