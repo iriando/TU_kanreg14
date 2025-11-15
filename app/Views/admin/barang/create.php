@@ -1,36 +1,41 @@
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 
-<div class="card">
-    <div class="card-header">
-        <h3 class="card-title">Tambah Barang</h3>
+<form action="<?= site_url('barang/store') ?>" method="post">
+<?= csrf_field() ?>
+    <div class="card card-primary">
+        <div class="card-header">
+            <h3 class="card-title">Tambah Barang</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <label>Kode Barang</label>
+                        <input type="text" name="kode_barang" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nama Barang</label>
+                        <input type="text" name="nama_barang" class="form-control" required>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label>Kategori</label>
+                        <input type="text" name="kategori" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Keterangan</label>
+                        <textarea name="keterangan" class="form-control" rows="4"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="card-body">
-        <form action="<?= site_url('barang/store') ?>" method="post">
-            <?= csrf_field() ?>
-
-            <div class="form-group">
-                <label>Kode Barang</label>
-                <input type="text" name="kode_barang" class="form-control" required>
-            </div>
-
-            <div class="form-group">
-                <label>Nama Barang</label>
-                <input type="text" name="nama_barang" class="form-control" required>
-            </div>
-
-            <div class="form-group">
-                <label>Kategori</label>
-                <input type="text" name="kategori" class="form-control">
-            </div>
-
-            <div class="form-group">
-                <label>Keterangan</label>
-                <textarea name="keterangan" class="form-control"></textarea>
-            </div>
-
-            <hr>
-            <h5>Unit Barang</h5>
+    <div class="card">
+        <div class="card-body">
             <div id="units-wrapper">
                 <div class="unit-row mb-2">
                     <input type="text" name="units[0][kode_unit]" placeholder="Kode Unit" class="form-control d-inline-block w-25">
@@ -38,18 +43,18 @@
                     <select name="units[0][status]" class="form-control d-inline-block w-25">
                         <option value="tersedia">tersedia</option>
                     </select>
-                    <button type="button" class="btn btn-danger btn-sm remove-unit">X</button>
+                    <button type="button" class="btn btn-danger btn-sm remove-unit"><i class="nav-icon fas fa-trash"></i></button>
                 </div>
             </div>
-            <button type="button" class="btn btn-secondary btn-sm" id="add-unit">+ Tambah Unit</button>
-
-            <div class="mt-3">
-                <button type="submit" class="btn btn-success">Simpan</button>
-                <a href="<?= site_url('barang') ?>" class="btn btn-secondary">Kembali</a>
-            </div>
-        </form>
+            <button type="button" class="btn btn-primary btn-sm" id="add-unit">+ Tambah Unit</button>
+        </div>
     </div>
-</div>
+    <div class="mt-3">
+        <button type="submit" class="btn btn-success">Simpan</button>
+        <a href="<?= site_url('barang') ?>" class="btn btn-secondary">Kembali</a>
+    </div>  
+</form>
+
 
 <script>
     let unitIndex = 1;
@@ -63,7 +68,7 @@
             <select name="units[${unitIndex}][status]" class="form-control d-inline-block w-25">
                 <option value="tersedia">tersedia</option>
             </select>
-            <button type="button" class="btn btn-danger btn-sm remove-unit">X</button>
+            <button type="button" class="btn btn-danger btn-sm remove-unit"><i class="nav-icon fas fa-trash"></i></button>
         `;
         wrapper.appendChild(newRow);
 
