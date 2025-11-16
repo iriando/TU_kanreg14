@@ -15,7 +15,7 @@
   <div class="login-box">
     <!-- Logo -->
     <div class="login-logo">
-      <a href="#"><b>SiMAPAN</b></a>
+      <a href="#"><b>SiMAPAN Kanreg XIV</b></a>
     </div>
   </div>
 
