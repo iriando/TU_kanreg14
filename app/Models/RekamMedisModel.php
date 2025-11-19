@@ -4,16 +4,23 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class PegawaiModel extends Model
+class RekamMedisModel extends Model
 {
-    protected $table            = 'pegawai';
+    protected $table            = 'rekam_medis';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'object';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        'nama', 'unit', 'tanggal_lahir', 'gender',
+        'nama_pasien',
+        'keluhan',
+        'kode_barang',
+        'nama_barang',
+        'jumlah',
+        'tanggal_distribusi',
+        'keterangan',
+        'petugas',
     ];
 
     protected bool $allowEmptyInserts = false;

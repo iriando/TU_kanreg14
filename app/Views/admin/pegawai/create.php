@@ -13,6 +13,17 @@
                 <input type="text" name="nama" class="form-control" value="<?= old('nama') ?>" required>
             </div>
             <div class="form-group">
+                <label>Jenis kelamin</label>
+                <select name="gender" class="form-control">
+                    <option value="pria">pria</option>
+                    <option value="wanita">wanita</option>
+                </select>
+            </div>
+            <div class="form-group col">
+                <label for="kedaluwarsa">Tanggal Lahir</label>
+                <input type="date" name="tanggal_lahir" class="form-control" value="<?= old('tanggal_lahir') ?>" required>
+            </div>
+            <div class="form-group">
                 <label for="unit">Unit/Pokja</label>
                 <input type="text" name="unit" class="form-control" value="<?= old('unit') ?>" required>
             </div>
