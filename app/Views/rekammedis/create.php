@@ -102,7 +102,9 @@
         <a href="<?= base_url('/rekammedis') ?>" class="btn btn-secondary">Kembali</a>
     </form>
 </div>
+<?= $this->endSection() ?>
 
+<?= $this->section('scripts') ?>
 <script>
 // Auto-set nama obat ke hidden input
 function syncNamaBarang(selectEl) {
@@ -141,6 +143,23 @@ document.addEventListener("change", function (e) {
         syncNamaBarang(e.target);
     }
 });
+    
+    <?php if (session()->getFlashdata('success')): ?>
+        toastr.success("<?= session()->getFlashdata('success') ?>");
+    <?php endif; ?>
+
+    <?php if (session()->getFlashdata('error')): ?>
+        toastr.error("<?= session()->getFlashdata('error') ?>");
+    <?php endif; ?>
+
+    <?php if (session()->getFlashdata('warning')): ?>
+        toastr.warning("<?= session()->getFlashdata('warning') ?>");
+    <?php endif; ?>
+
+    <?php if (session()->getFlashdata('info')): ?>
+        toastr.info("<?= session()->getFlashdata('info') ?>");
+    <?php endif; ?>
+
 </script>
 
 <?= $this->endSection() ?>

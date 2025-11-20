@@ -50,8 +50,11 @@ class DistribusiObat extends BaseController
             'nama_penerima'      => 'required',
             'tanggal_distribusi' => 'required|valid_date',
         ];
+
         if (! $this->validate($rules)) {
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+            return redirect()->back()
+                ->withInput()
+                ->with('errors', $this->validator->getErrors());
         }
 
         $kodeBarangArr = $this->request->getPost('kode_barang'); 
@@ -62,14 +65,29 @@ class DistribusiObat extends BaseController
         $petugas       = user()->username;
 
         foreach ($kodeBarangArr as $i => $kode) {
+
             $jumlah = (int) ($jumlahArr[$i] ?? 0);
             if ($jumlah < 1) continue;
 
+            // 🔍 Ambil data obat
             $obat = $this->obatModel->where('kode_barang', $kode)->first();
             if (! $obat) {
-                return redirect()->back()->withInput()->with('errors', ['kode_barang'=>'Obat tidak ditemukan']);
+                return redirect()->back()->withInput()->with('error', "Obat dengan kode $kode tidak ditemukan");
             }
 
+            // 🔎 Validasi stok habis
+            if ($obat->sisa <= 0) {
+                return redirect()->back()->withInput()->with('error', "Stok obat <b>{$obat->nama_barang}</b> sudah HABIS!");
+            }
+
+            // 🔎 Validasi stok tidak cukup
+            if ($obat->sisa < $jumlah) {
+                return redirect()->back()->withInput()->with('error', 
+                    "Stok obat <b>{$obat->nama_barang}</b> tidak cukup! (Sisa: {$obat->sisa}, Diminta: $jumlah)"
+                );
+            }
+
+            // ✔ Simpan distribusi obat
             $this->distribusiobatModel->insert([
                 'kode_barang'        => $kode,
                 'nama_barang'        => $obat->nama_barang,
@@ -83,9 +101,9 @@ class DistribusiObat extends BaseController
 
             $this->recalcObat($kode);
         }
-
         return redirect()->to('/distribusiobat')->with('message', 'Distribusi obat berhasil ditambahkan');
     }
+
 
     // Form edit
     public function edit($id)

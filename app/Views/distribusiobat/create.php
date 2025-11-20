@@ -60,7 +60,9 @@
         </form>
     </div>
 </div>
+<?= $this->endSection() ?>
 
+<?= $this->section('scripts') ?>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const wrapper = document.getElementById("obat-wrapper");
@@ -91,6 +93,22 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 });
+
+    <?php if (session()->getFlashdata('success')): ?>
+        toastr.success("<?= session()->getFlashdata('success') ?>");
+    <?php endif; ?>
+
+    <?php if (session()->getFlashdata('error')): ?>
+        toastr.error("<?= session()->getFlashdata('error') ?>");
+    <?php endif; ?>
+
+    <?php if (session()->getFlashdata('warning')): ?>
+        toastr.warning("<?= session()->getFlashdata('warning') ?>");
+    <?php endif; ?>
+
+    <?php if (session()->getFlashdata('info')): ?>
+        toastr.info("<?= session()->getFlashdata('info') ?>");
+    <?php endif; ?>
 </script>
 
 <?= $this->endSection() ?>

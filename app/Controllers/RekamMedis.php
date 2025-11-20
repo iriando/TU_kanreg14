@@ -120,23 +120,41 @@ class RekamMedis extends BaseController
             'keterangan'   => $data['keterangan'],
         ]);
 
-        // 2️⃣ Simpan distribusi obat sekalian update stok
+        // 2️⃣ Validasi & Simpan Distribusi Obat
         if (!empty($data['kode_barang'])) {
 
             foreach ($data['kode_barang'] as $i => $kode) {
 
-                if ($kode == "" || $data['jumlah'][$i] == "") continue;
+                if ($kode == "" || $data['jumlah'][$i] == "") {
+                    continue;
+                }
 
                 // Ambil data obat
                 $obat = $this->obatModel->where('kode_barang', $kode)->first();
-                if (! $obat) continue;
+                if (!$obat) continue;
 
-                // Buat record distribusi obat
+                $jumlahRequest = (int) $data['jumlah'][$i];
+
+                // ❌ VALIDASI STOK HABIS
+                if ($obat->sisa <= 0) {
+                    return redirect()->back()
+                        ->with('error', "Stok obat <b>{$obat->nama_barang}</b> sudah <b>HABIS</b>!")
+                        ->withInput();
+                }
+
+                // ❌ VALIDASI STOK TIDAK CUKUP
+                if ($jumlahRequest > $obat->sisa) {
+                    return redirect()->back()
+                        ->with('error', "Stok obat <b>{$obat->nama_barang}</b> tidak cukup! Stok tersisa: <b>{$obat->sisa}</b>")
+                        ->withInput();
+                }
+
+                // ✔️ Simpan distribusi obat
                 $this->distribusiobatModel->insert([
                     'rekam_medis_id'    => $rekamMedisId,
                     'kode_barang'       => $kode,
                     'nama_barang'       => $obat->nama_barang,
-                    'jumlah'            => $data['jumlah'][$i],
+                    'jumlah'            => $jumlahRequest,
                     'nama_penerima'     => $data['nama_pasien'],
                     'tanggal_distribusi'=> $data['tanggal'],
                     'petugas'           => user()->username,
@@ -144,13 +162,15 @@ class RekamMedis extends BaseController
                     'created_at'        => date('Y-m-d H:i:s'),
                 ]);
 
-                // 🔄 Update stok: recalc ulang
+                // 🔄 Recalc stok obat
                 $this->recalcObat($kode);
             }
         }
 
-        return redirect()->to('/rekammedis')->with('success', 'Rekam medis berhasil disimpan!');
+        return redirect()->to('/rekammedis')
+            ->with('success', 'Rekam medis berhasil disimpan!');
     }
+
 
     // 🔄 fungsi recalcObat sama seperti di controller DistribusiObat
     private function recalcObat($kodeBarang)
