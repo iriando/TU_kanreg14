@@ -13,6 +13,7 @@ class DistribusiObatModel extends Model
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
+        'rekam_medis_id',
         'nama_penerima',
         'kode_barang',
         'nama_barang',

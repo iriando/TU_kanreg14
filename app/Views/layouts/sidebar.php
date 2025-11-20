@@ -32,7 +32,7 @@
         <?php if (in_groups(['admin', 'petugas BMN', 'petugas klinik' ])): ?>
         <li class="nav-item">
           <a href="<?= base_url('distribusiobat') ?>" class="nav-link">
-            <i class="nav-icon fas fa-book-medical"></i>
+            <i class="nav-icon fas fa-prescription-bottle"></i>
             <p>Distribusi Obat-obatan</p>
           </a>
         </li>
@@ -52,6 +52,14 @@
             <i class="nav-icon fas fa-running"></i>
             <p>Log Pegawai</p>
             <span class="badge badge-danger navbar-badge">Beta</span>
+          </a>
+        </li>
+
+        <li class="nav-header">Klinik</li>
+        <li class="nav-item">
+          <a href="<?= base_url('rekammedis') ?>" class="nav-link">
+            <i class="nav-icon fas fa-book-medical"></i>
+            <p>Rekam Medis</p>
           </a>
         </li>
 

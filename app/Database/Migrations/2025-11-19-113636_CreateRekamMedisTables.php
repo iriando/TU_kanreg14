@@ -19,19 +19,6 @@ class CreateRekamMedisTables extends Migration
                 'type'       => 'VARCHAR',
                 'constraint' => '255',
             ],
-            'kode_barang' => [
-                'type'       => 'VARCHAR',
-                'constraint' => '50',
-            ],
-            'nama_barang' => [
-                'type'       => 'VARCHAR',
-                'constraint' => '255',
-            ],
-            'jumlah' => [
-                'type'       => 'INT',
-                'constraint' => 11,
-                'default'    => 1,
-            ],
             'tanggal' => [
                 'type' => 'DATETIME',
                 'null' => false,

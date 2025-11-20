@@ -157,6 +157,15 @@ $routes->group('logpegawai', ['namespace' => 'App\Controllers'], function($route
     });
 });
 
+$routes->group('rekammedis', ['namespace' => 'App\Controllers'], function($routes) {
+    $routes->get('/', 'RekamMedis::index');
+    $routes->group('', ['filter' => 'role:admin'], function($routes) {
+        $routes->get('create/(:num)', 'RekamMedis::create/$1');
+        $routes->post('store', 'RekamMedis::store');
+        $routes->get('view/(:num)', 'RekamMedis::view/$1');
+    });
+});
+
 
 
 

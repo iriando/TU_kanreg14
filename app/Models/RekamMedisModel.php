@@ -13,12 +13,10 @@ class RekamMedisModel extends Model
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
+        'id_pegawai',
         'nama_pasien',
         'keluhan',
-        'kode_barang',
-        'nama_barang',
-        'jumlah',
-        'tanggal_distribusi',
+        'tanggal',
         'keterangan',
         'petugas',
     ];
@@ -52,4 +50,9 @@ class RekamMedisModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function details()
+    {
+        return $this->hasMany(DistribusiObatModel::class, 'rekam_medis_id');
+    }
 }
