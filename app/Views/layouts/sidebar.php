@@ -109,6 +109,18 @@
           </a>
         </li>
         <li class="nav-item">
+          <a href="<?= site_url('roles/') ?>" class="nav-link">
+            <i class="nav-icon fas fa-users-cog"></i>
+            <p>Role Manager</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="<?= site_url('permissions/') ?>" class="nav-link">
+            <i class="nav-icon fas fa-users-cog"></i>
+            <p>Permission Manager</p>
+          </a>
+        </li>
+        <li class="nav-item">
           <a href="<?= site_url('template') ?>" class="nav-link">
             <i class="nav-icon fas fa-file"></i>
             <p>Template Manager</p>

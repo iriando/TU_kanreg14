@@ -166,6 +166,34 @@ $routes->group('rekammedis', ['namespace' => 'App\Controllers'], function($route
     });
 });
 
+$routes->group('permissions', [
+    'namespace' => 'App\Controllers',
+    'filter'    => 'role:admin'
+], function($routes) {
+    $routes->get('/', 'PermissionManager::index');
+    $routes->get('create', 'PermissionManager::create');
+    $routes->post('store', 'PermissionManager::store');
+    $routes->get('edit/(:num)', 'PermissionManager::edit/$1');
+    $routes->post('update/(:num)', 'PermissionManager::update/$1');
+    $routes->get('delete/(:num)', 'PermissionManager::delete/$1');
+});
+
+$routes->group('roles', [
+    'namespace' => 'App\Controllers',
+    'filter'    => 'role:admin'
+], function($routes) {
+    $routes->get('/', 'RoleManager::index');
+    $routes->get('create', 'RoleManager::create');
+    $routes->post('store', 'RoleManager::store');
+    $routes->get('edit/(:num)', 'RoleManager::edit/$1');
+    $routes->get('permissions/(:num)', 'RoleManager::permissions/$1');
+    $routes->post('(:num)/permissions/update', 'RoleManager::updatePermissions/$1');
+    $routes->post('update/(:num)', 'RoleManager::update/$1');
+    $routes->get('delete/(:num)', 'RoleManager::delete/$1');
+
+    // Assign permissions to role
+    $routes->post('assign-permissions/(:num)', 'RoleManager::assignPermissions/$1');
+});
 
 
 
