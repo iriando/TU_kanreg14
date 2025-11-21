@@ -75,6 +75,7 @@ $routes->group('barang', ['namespace' => 'App\Controllers'], function($routes) {
         $routes->get('edit-unit/(:num)', 'Barang::editUnit/$1');
         $routes->post('update-unit/(:num)', 'Barang::updateUnit/$1');
         $routes->get('delete-unit/(:num)', 'Barang::deleteUnit/$1');
+        $routes->get('getUnits/(:segment)', 'Barang::getUnits/$1'); //untuk show child
     });
 });
 

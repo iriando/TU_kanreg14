@@ -196,4 +196,12 @@ class Barang extends Controller
         }
     }
 
+    public function getUnits($kode_barang)
+    {
+        $units = $this->barangUnit
+            ->where('kode_barang', $kode_barang)
+            ->findAll();
+
+        return $this->response->setJSON($units);
+    }
 }
