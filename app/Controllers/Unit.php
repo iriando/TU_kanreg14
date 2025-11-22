@@ -19,7 +19,7 @@ class Unit extends BaseController
     
     public function view($id)
     {
-        // Ambil data unit berdasarkan ID
+        // Ambil data unit berdasarkan slug
         $unit = $this->barangUnit->where('slug', $id)->first();
         if (!$unit) {
             throw new \CodeIgniter\Exceptions\PageNotFoundException('Unit tidak ditemukan.');
@@ -30,16 +30,16 @@ class Unit extends BaseController
             ->where('kode_barang', $unit['kode_barang'])
             ->first();
 
-        // Model log
+        // Ambil log pemeliharaan berdasarkan kode_barang
         $logPemeliharaanModel = new \App\Models\MaintenanceModel();
         $logPeminjamanDetailModel = new \App\Models\PeminjamanDetailModel();
 
-        // Ambil log berdasarkan kode_barang (karena tidak ada kolom kode_unit)
         $log_pemeliharaan = $logPemeliharaanModel
             ->where('kode_barang', $unit['kode_barang'])
             ->orderBy('tanggal', 'DESC')
             ->findAll();
 
+        // 🔥 FIX: Filter log_peminjaman berdasarkan (kode_unit + kode_barang)
         $log_peminjaman = $logPeminjamanDetailModel
             ->select('
                 log_peminjaman_detail.*,
@@ -49,6 +49,7 @@ class Unit extends BaseController
             ')
             ->join('log_peminjaman', 'log_peminjaman.id = log_peminjaman_detail.peminjaman_id')
             ->where('log_peminjaman_detail.kode_unit', $unit['kode_unit'])
+            ->where('log_peminjaman_detail.kode_barang', $unit['kode_barang']) // ⬅ tambahan penting
             ->orderBy('log_peminjaman_detail.tanggal_pinjam', 'DESC')
             ->findAll();
 

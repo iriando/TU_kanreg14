@@ -164,8 +164,30 @@ class Peminjaman extends BaseController
 
     public function delete($id)
     {
-        $this->peminjamanModel->deletePeminjaman($id);
+        // 1. Ambil semua detail peminjaman (ada kode_unit + kode_barang)
+        $details = $this->peminjamanDetailModel
+                        ->where('peminjaman_id', $id)
+                        ->findAll();
+        $unitIds = [];
+        if (!empty($details)) {
+            foreach ($details as $d) {
+                // Cocokkan unit secara aman berdasarkan kode_unit + kode_barang
+                $unit = $this->unitModel
+                            ->where('kode_unit', $d->kode_unit)
+                            ->where('kode_barang', $d->kode_barang)
+                            ->first();
+                if ($unit) {
+                    $unitIds[] = $unit['id'];
+                }
+            }
+            // 2. Kembalikan unit menjadi tersedia
+            if (!empty($unitIds)) {
+                $this->unitModel->setTersedia($unitIds);
+            }
+        }
         $this->peminjamanDetailModel->where('peminjaman_id', $id)->delete();
+        $this->peminjamanModel->deletePeminjaman($id);
+        
         return redirect()->to('/peminjaman')->with('success', 'Peminjaman berhasil dihapus');
     }
 }
