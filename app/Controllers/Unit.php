@@ -30,13 +30,11 @@ class Unit extends BaseController
             ->where('kode_barang', $unit['kode_barang'])
             ->first();
 
-        // Model log
         $logPemeliharaanModel = new \App\Models\MaintenanceModel();
         $logPeminjamanDetailModel = new \App\Models\PeminjamanDetailModel();
 
-        // Ambil log berdasarkan kode_barang (karena tidak ada kolom kode_unit)
         $log_pemeliharaan = $logPemeliharaanModel
-            ->where('kode_barang', $unit['kode_barang'])
+            ->where('kode_unit', $unit['kode_unit'])
             ->orderBy('tanggal', 'DESC')
             ->findAll();
 
