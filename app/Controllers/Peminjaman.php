@@ -97,7 +97,7 @@ class Peminjaman extends BaseController
 
     public function kembalikan()
     {
-        $unitKembali      = $this->request->getPost('unit_kembali'); // array kode_unit
+        $unitKembali      = $this->request->getPost('unit_kembali'); // array id_unit
         $peminjamanId     = $this->request->getPost('id');
         $tanggal_kembali  = $this->request->getPost('tanggal_kembali');
         $petugas          = user()->username;
@@ -116,15 +116,17 @@ class Peminjaman extends BaseController
                 ->withInput()
                 ->with('error', 'Tanggal kembali tidak boleh lebih awal dari tanggal pinjam!');
         }
-
         // 1️⃣ Update status setiap unit → tersedia
         $this->unitModel->setTersedia($unitKembali);
 
         // 2️⃣ Tambah log detail pengembalian
-        foreach ($unitKembali as $kode_unit) {
+        foreach ($unitKembali as $unitId) {
+            $unit = $this->unitModel->find($unitId);
+
+            // Update log detail
             $this->peminjamanDetailModel
                 ->where('peminjaman_id', $peminjamanId)
-                ->where('kode_unit', $kode_unit)
+                ->where('kode_unit', $unit['kode_unit'])
                 ->set([
                     'status_unit'    => 'dikembalikan',
                     'tanggal_kembali'=> $tanggal_kembali,

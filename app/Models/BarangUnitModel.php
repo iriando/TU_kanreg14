@@ -71,12 +71,11 @@ class BarangUnitModel extends Model
                     ->update();
     }
 
-    public function setTersedia($kodeUnits)
+    public function setTersedia(array $ids)
     {
-        if (empty($kodeUnits)) return;
-        $this->whereIn('kode_unit', $kodeUnits)
-            ->set(['status' => 'tersedia'])
-            ->update();
+        return $this->whereIn('id', $ids)
+                    ->set(['status' => 'tersedia'])
+                    ->update();
     }
 
     public function getByStatus($kodeBarang, $status)

@@ -209,7 +209,9 @@ $(document).on('click', '.btn-kembalikan', function () {
         if (data.length > 0) {
             data.forEach(function (item) {
                 $('#unitKembali').append(
-                    `<option value="${item.id}">${item.merk} (${item.kode_unit})</option>`
+                    `<option value="${item.id}" data-kode="${item.kode_unit}">
+                        ${item.merk} (${item.kode_unit})
+                    </option>`
                 );
             });
         } else {
