@@ -129,6 +129,7 @@ $routes->group('maintenance', ['namespace' => 'App\Controllers'], function($rout
     $routes->get('/', 'Maintenance::index');
     $routes->get('create', 'Maintenance::create');
     $routes->post('store', 'Maintenance::store');
+    $routes->get('getBarangUnit', 'Maintenance::getBarangUnit');
     $routes->group('', ['filter' => 'role:admin'], function($routes) {
         $routes->get('edit/(:num)', 'Maintenance::edit/$1');
         $routes->post('update/(:num)', 'Maintenance::update/$1');

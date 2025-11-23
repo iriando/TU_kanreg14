@@ -136,45 +136,21 @@ class Maintenance extends BaseController
         return redirect()->to('/maintenance')->with('success', 'Data peminjaman berhasil diperbarui');
     }
 
-    // public function update($id)
-    // {
-    //     $validation = \Config\Services::validation();
+    public function getBarangUnit()
+    {
+        $kode_barang = $this->request->getGet('kode_barang');
 
-    //     $rules = [
-    //         'nama_petugas' => 'required',
-    //         'tanggal'      => 'required',
-    //     ];
+        if (!$kode_barang) {
+            return $this->response->setJSON([]);
+        }
 
-    //     if (!$this->validate($rules)) {
-    //         return redirect()->back()->withInput()->with('errors', $validation->getErrors());
-    //     }
+        $units = $this->unitModel
+            ->where('kode_barang', $kode_barang)
+            ->where('status !=', 'Dipinjam') // jika ingin hanya unit tersedia (opsional)
+            ->findAll();
 
-    //     $nama_petugas = $this->request->getPost('nama_petugas');
-    //     $kode_barang  = $this->request->getPost('kode_barang');
-    //     $kode_unit    = $this->request->getPost('kode_unit');
-    //     $tanggal      = $this->request->getPost('tanggal');
-    //     $keterangan   = $this->request->getPost('keterangan');
-    //     $pengingat    = $this->request->getPost('pengingat');
-    //     $hari         = $this->request->getPost('hari') ?? null;
-
-    //     $barang = $this->barangModel->where('kode_barang', $kode_barang)->first();
-    //     $unit   = $this->unitModel->where('kode_unit', $kode_unit)->first();
-
-    //     $this->maintenanceModel->update($id, [
-    //         'nama_petugas' => $nama_petugas,
-    //         'nama_barang'  => $barang['nama_barang'] ?? null,
-    //         'kode_barang'  => $kode_barang,
-    //         'kode_unit'    => $kode_unit,
-    //         'unit'         => $unit['merk'] ?? null,
-    //         'tanggal'      => $tanggal,
-    //         'pengingat'    => $pengingat,
-    //         'hari'         => $pengingat === 'Aktif' ? $hari : null,
-    //         'keterangan'   => $keterangan,
-    //     ]);
-
-    //     return redirect()->to(site_url('maintenance'))->with('success', 'Data maintenance berhasil diperbarui.');
-    // }
-
+        return $this->response->setJSON($units);
+    }
 
     public function delete($id)
     {

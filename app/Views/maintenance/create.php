@@ -95,7 +95,7 @@
             let kode_barang = $(this).val();
             if (kode_barang) {
                 $.ajax({
-                    url: '/peminjaman/getBarangUnit',
+                    url: '/maintenance/getBarangUnit',
                     type: 'GET',
                     data: { kode_barang: kode_barang },
                     dataType: 'json',
