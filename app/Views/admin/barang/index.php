@@ -74,6 +74,7 @@ function formatUnit(units) {
                     <th>Merk</th>
                     <th>Status</th>
                     <th>Kondisi</th>
+                    <th>keterangan</th>
                 </tr>
             </thead>
             <tbody>
@@ -86,6 +87,7 @@ function formatUnit(units) {
                 <td>${u.merk ?? ''}</td>
                 <td>${u.status}</td>
                 <td>${u.kondisi}</td>
+                <td>${u.keterangan}</td>
             </tr>
         `;
     });

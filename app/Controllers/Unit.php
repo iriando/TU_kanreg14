@@ -36,6 +36,7 @@ class Unit extends BaseController
 
         $log_pemeliharaan = $logPemeliharaanModel
             ->where('kode_barang', $unit['kode_barang'])
+            ->where('kode_unit', $unit['kode_unit'])
             ->orderBy('tanggal', 'DESC')
             ->findAll();
 

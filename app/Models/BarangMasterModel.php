@@ -77,6 +77,7 @@ class BarangMasterModel extends Model
                     'kode_unit'   => $unit['kode_unit'],
                     'merk'        => $unit['merk'] ?? null,
                     'status'      => $unit['status'] ?? null,
+                    'slug'        => strtolower($kodeBarang . '-' . $unit['kode_unit']),
                 ]);
             }
         }
