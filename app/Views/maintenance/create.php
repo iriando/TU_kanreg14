@@ -6,16 +6,6 @@
         <h3 class="card-title">Tambah Pemeliharaan BMN</h3>
     </div>
     <div class="card-body">
-        <?php if(session()->getFlashdata('errors')): ?>
-            <div class="alert alert-danger">
-                <ul>
-                    <?php foreach(session()->getFlashdata('errors') as $error): ?>
-                        <li><?= $error ?></li>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
-        <?php endif; ?>
-
         <form action="<?= site_url('maintenance/store') ?>" method="post">
             <?= csrf_field() ?>
             <div class="row">

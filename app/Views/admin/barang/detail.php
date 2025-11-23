@@ -35,13 +35,12 @@
             <thead>
                 <tr>
                     <th>No</th>
-                    <th>Kode Unit</th>
+                    <th>Kode Unit (NUP)</th>
                     <th>Merk</th>
                     <th>Status</th>
                     <th>Kondisi</th>
                     <th>Keterangan</th>
-                    <th>Tanggal Dibuat</th>
-                    <th>Tanggal Update</th>
+                    <th>Ditambahkan</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -56,7 +55,6 @@
                             <td><?= esc($unit['kondisi']) ?></td>
                             <td><?= esc($unit['keterangan']) ?></td>
                             <td><?= esc($unit['created_at']) ?></td>
-                            <td><?= esc($unit['updated_at']) ?></td>
                             <td>
                                 <a href="<?= site_url('barang/view-unit/'.$unit['slug']) ?>" 
                                 class="btn btn-info btn-sm">Lihat</a>

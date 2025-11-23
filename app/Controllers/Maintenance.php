@@ -146,7 +146,7 @@ class Maintenance extends BaseController
 
         $units = $this->unitModel
             ->where('kode_barang', $kode_barang)
-            ->where('status !=', 'Dipinjam') // jika ingin hanya unit tersedia (opsional)
+            ->where('status !=', 'Dipinjam')
             ->findAll();
 
         return $this->response->setJSON($units);
@@ -155,7 +155,7 @@ class Maintenance extends BaseController
     public function delete($id)
     {
         $this->maintenanceModel->delete($id);
-        return redirect()->to('/maintenance')->with('message', 'Log berhasil dihapus');
+        return redirect()->to('/maintenance')->with('success', 'Log berhasil dihapus');
     }
 
     public function selesai($id)
