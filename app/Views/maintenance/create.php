@@ -39,6 +39,14 @@
                     <select name="barangunit[]" id="barang_unit" style="width: 100%;" class="select2 form-control" multiple="multiple" data-placeholder="Pilih Unit" required>
                     </select>
                 </div>
+                <div class="col form-group">
+                    <label for="status_unit">Status Unit</label>
+                    <select name="status_unit" id="status_unit" class="form-control" required>
+                        <option value="">-- Pilih Status --</option>
+                        <option value="Tersedia">Tersedia</option>
+                        <option value="Rusak">Rusak</option>
+                    </select>
+                </div>
             </div>
             
             <div class="row">

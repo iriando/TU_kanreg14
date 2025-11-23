@@ -52,9 +52,16 @@ class Maintenance extends BaseController
         $nama_petugas = $this->request->getPost('nama_petugas');
         $kode_barang  = $this->request->getPost('kode_barang');
         $barangunits  = $this->request->getPost('barangunit'); // array id unit
+        $statusUnit   = $this->request->getPost('status_unit');
         $tanggal      = $this->request->getPost('tanggal');
         $keterangan   = $this->request->getPost('keterangan');
         
+        // update status unit barang
+        $this->unitModel
+            ->whereIn('id', $barangunits)
+            ->set(['status' => $statusUnit])
+            ->update();
+
         // pengingat: checkbox (1 atau 0)
         $pengingat    = $this->request->getPost('pengingat') ? 1 : 0;
         $hari         = $pengingat ? $this->request->getPost('hari') : null;
