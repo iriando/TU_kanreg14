@@ -118,23 +118,44 @@ class Maintenance extends BaseController
     public function update($id)
     {
         $maintenance = $this->maintenanceModel->find($id);
-
         if (!$maintenance) {
-            throw new \CodeIgniter\Exceptions\PageNotFoundException('Pemeliharaan tidak ditemukan');
+            throw new \CodeIgniter\Exceptions\PageNotFoundException('Data pemeliharaan tidak ditemukan');
         }
 
-        $kodeBarang   = $this->request->getPost('kode_barang');
-        // $barang       = $this->barangModel->where('kode_barang', $kodeBarang)->first();
+        $nama_petugas = $this->request->getPost('nama_petugas');
+        $tanggal      = $this->request->getPost('tanggal');
+        $keterangan   = $this->request->getPost('keterangan');
+        $statusUnit   = $this->request->getPost('status_unit');
 
-        $data = [
-            'nama_petugas'   => $this->request->getPost('nama_petugas'),
-            'tanggal'  => $this->request->getPost('tanggal'),
-        ];
+        // Update status unit barang berdasarkan kode_unit sebelumnya
+        $this->unitModel
+            ->where('kode_unit', $maintenance->kode_unit)
+            ->set(['status' => $statusUnit])
+            ->update();
 
-        $this->maintenanceModel->update($id, $data);
+        // Pengingat
+        $pengingat    = $this->request->getPost('pengingat') == 'Aktif' ? 1 : 0;
+        $hari         = $pengingat ? $this->request->getPost('hari') : null;
 
-        return redirect()->to('/maintenance')->with('success', 'Data peminjaman berhasil diperbarui');
+        $tanggal_pengingat = null;
+        if ($pengingat && $hari) {
+            $tanggal_pengingat = date('Y-m-d H:i:s', strtotime($tanggal . ' + ' . $hari . ' days'));
+        }
+
+        // Update maintenance
+        $this->maintenanceModel->update($id, [
+            'nama_petugas'      => $nama_petugas,
+            'tanggal'           => $tanggal,
+            'keterangan'        => $keterangan,
+            'pengingat'         => $pengingat,
+            'hari'              => $hari,
+            'tanggal_pengingat' => $tanggal_pengingat,
+            'status'            => $statusUnit,
+        ]);
+
+        return redirect()->to('/maintenance')->with('success', 'Data pemeliharaan berhasil diperbarui');
     }
+
 
     public function getBarangUnit()
     {
