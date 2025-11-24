@@ -5,6 +5,9 @@ namespace App\Controllers;
 use App\Models\BarangMasterModel;
 use App\Models\BarangUnitModel;
 use CodeIgniter\Controller;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\Encoding\Encoding;
 
 class Barang extends Controller
 {
@@ -136,6 +139,12 @@ class Barang extends Controller
             'slug'        => strtolower($kode_barang . '-' . $kode_unit),
         ];
         if ($this->barangUnit->insert($data)) {
+            // Ambil ID unit setelah insert
+            $unitId = $this->barangUnit->getInsertID();
+
+            // Panggil fungsi generate QR code
+            $this->generateQRCodeForUnit($unitId);
+
             return redirect()->to('/barang/detail/' . $kode_barang)
                 ->with('success', 'Unit berhasil ditambahkan.');
         }
@@ -161,17 +170,23 @@ class Barang extends Controller
         if (!$unit) {
             return redirect()->to('/barang')->with('error', 'Unit tidak ditemukan.');
         }
-
+        $newSlug = strtolower($unit['kode_barang'] . '-' . $kode_unit);
         $data = [
             'kode_unit' => $kode_unit,
             'merk'      => $this->request->getPost('merk'),
             'status'    => $this->request->getPost('status'),
             'kondisi'   => $this->request->getPost('kondisi'),
             'keterangan'  => $this->request->getPost('keterangan'),
-            'slug'      => strtolower($unit['kode_barang'] . '-' . $kode_unit),
+            'slug'      => $newSlug,
         ];
 
         if ($this->barangUnit->update($id, $data)) {
+
+            $updatedUnit = $this->barangUnit->find($id);
+            if ($unit['slug'] !== $newSlug || empty($unit['qr_code'])) {
+                $this->generateQrCodeForUnit($updatedUnit);
+            }
+
             return redirect()->to('/barang/detail/' . $unit['kode_barang'])
                 ->with('success', 'Unit berhasil diperbarui.');
         }
@@ -204,4 +219,62 @@ class Barang extends Controller
 
         return $this->response->setJSON($units);
     }
+
+    private function generateQrCodeForUnit($unit)
+    {
+        // Jika unit yang dikirim adalah ID, ambil datanya dulu
+        if (is_int($unit)) {
+            $unit = $this->barangUnit->find($unit);
+        }
+
+        if (!$unit || !is_array($unit)) {
+            return;
+        }
+
+        $url = base_url('/barang/view-unit/' . $unit['slug']);
+
+        $fileName = 'qr-' . $unit['id'] . '.png';
+        $saveDir  = WRITEPATH . 'uploads/qr/';
+        $savePath = $saveDir . $fileName;
+
+        if (!is_dir($saveDir)) {
+            mkdir($saveDir, 0777, true);
+        }
+
+        // ====== QR CODE VERSION 6 ======
+        $qr = new QrCode(
+            data: $url,
+            encoding: new Encoding('UTF-8'),
+            size: 300,
+            margin: 10
+        );
+
+        $writer = new PngWriter();
+        $writer->write($qr)->saveToFile($savePath);
+
+        // Simpan nama file ke database
+        $this->barangUnit->update($unit['id'], [
+            'qr_code' => $fileName
+        ]);
+    }
+
+    public function downloadQr($slug)
+    {
+        $unit = $this->barangUnit->where('slug', $slug)->first();
+        // dd($unit);
+        // die;
+
+        if (!$unit || empty($unit['qr_code'])) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        }
+
+        $filePath = WRITEPATH . 'uploads/qr/' . $unit['qr_code'];
+
+        if (!file_exists($filePath)) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("QR Code tidak ditemukan!");
+        }
+
+        return $this->response->download($filePath, null);
+    }
+
 }

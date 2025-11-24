@@ -58,6 +58,8 @@
                             <td>
                                 <a href="<?= site_url('barang/view-unit/'.$unit['slug']) ?>" 
                                 class="btn btn-info btn-sm">Lihat</a>
+                                <a href="<?= site_url('barang/download-unit-qr/'.$unit['slug']) ?>"
+                                class="btn btn-success btn-sm">Download QR</a>
                                 <a href="<?= site_url('barang/edit-unit/'.$unit['id']) ?>" 
                                 class="btn btn-warning btn-sm">Edit</a>
                                 <a href="<?= site_url('barang/delete-unit/'.$unit['id']) ?>" 
