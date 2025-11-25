@@ -62,8 +62,9 @@ class Maintenance extends BaseController
             ->set(['status' => $statusUnit])
             ->update();
 
-        // pengingat: checkbox (1 atau 0)
-        $pengingat    = $this->request->getPost('pengingat') ? 1 : 0;
+        // Pengingat
+        $pengingatVal = $this->request->getPost('pengingat');
+        $pengingat = ($pengingatVal === 'Aktif') ? 1 : 0;
         $hari         = $pengingat ? $this->request->getPost('hari') : null;
 
         $tanggal_pengingat = null;
@@ -134,7 +135,8 @@ class Maintenance extends BaseController
             ->update();
 
         // Pengingat
-        $pengingat    = $this->request->getPost('pengingat') == 'Aktif' ? 1 : 0;
+        $pengingatVal = $this->request->getPost('pengingat');
+        $pengingat = ($pengingatVal === 'Aktif') ? 1 : 0;
         $hari         = $pengingat ? $this->request->getPost('hari') : null;
 
         $tanggal_pengingat = null;
