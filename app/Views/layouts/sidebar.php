@@ -11,9 +11,9 @@
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
 
         <!-- Layanan -->
+         <?php if (in_groups(['admin', 'petugas BMN'])): ?>
         <li class="nav-header">Layanan</li>
 
-        <?php if (in_groups(['admin', 'petugas BMN'])): ?>
         <li class="nav-item">
           <a href="<?= base_url('peminjaman') ?>" class="nav-link">
             <i class="nav-icon fas fa-handshake"></i>
