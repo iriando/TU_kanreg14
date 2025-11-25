@@ -265,13 +265,17 @@ class Barang extends Controller
         // die;
 
         if (!$unit || empty($unit['qr_code'])) {
-            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+            // throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+            return redirect()->back()
+                ->with('error', 'Halaman tidak ditemukan. Mohon Update data!');
         }
 
         $filePath = WRITEPATH . 'uploads/qr/' . $unit['qr_code'];
 
         if (!file_exists($filePath)) {
-            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("QR Code tidak ditemukan!");
+            // throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("QR Code tidak ditemukan!");
+            return redirect()->back()
+                ->with('error', 'QR Code belum dibuat. Mohon update data!');
         }
 
         return $this->response->download($filePath, null);
