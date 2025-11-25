@@ -7,7 +7,16 @@
             <div class="row">
                 <div class="col-12 col-sm-6">
                     <div class="col-12">
-                        <!-- Gambar Barang -->
+                        <div class="col-12 text-center">
+                            <?php if (!empty($unit['gambar'])): ?>
+                                <img src="<?= base_url('uploads/unit-images/' . $unit['gambar']) ?>"
+                                    class="img-fluid img-thumbnail"
+                                    style="max-height: 250px; object-fit: cover;"
+                                    alt="Gambar Unit">
+                            <?php else: ?>
+                                <div class="text-muted small">Tidak ada gambar</div>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
 

@@ -21,6 +21,7 @@ class BarangUnitModel extends Model
         'keterangan',
         'slug',
         'qr_code',
+        'gambar',
     ];
 
     protected bool $allowEmptyInserts = false;

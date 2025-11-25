@@ -138,6 +138,15 @@ class Barang extends Controller
             'keterangan'  => $this->request->getPost('keterangan'),
             'slug'        => strtolower($kode_barang . '-' . $kode_unit),
         ];
+
+        // Upload gambar jika ada
+        $gambar = $this->request->getFile('gambar');
+        if ($gambar && $gambar->isValid()) {
+            $newName = $gambar->getRandomName();
+            $gambar->move(FCPATH . 'uploads/unit-images/', $newName);
+            $data['gambar'] = $newName;
+        }
+
         if ($this->barangUnit->insert($data)) {
             // Ambil ID unit setelah insert
             $unitId = $this->barangUnit->getInsertID();
@@ -179,6 +188,21 @@ class Barang extends Controller
             'keterangan'  => $this->request->getPost('keterangan'),
             'slug'      => $newSlug,
         ];
+
+        $gambarBaru = $this->request->getFile('gambar');
+        if ($gambarBaru && $gambarBaru->isValid()) {
+            // Hapus gambar lama jika ada
+            if (!empty($unit['gambar'])) {
+                $oldPath = FCPATH . 'uploads/unit-images/' . $unit['gambar'];
+                if (file_exists($oldPath)) {
+                    unlink($oldPath);
+                }
+            }
+            // Upload gambar baru
+            $newName = $gambarBaru->getRandomName();
+            $gambarBaru->move(FCPATH . 'uploads/unit-images/', $newName);
+            $data['gambar'] = $newName;
+        }
 
         if ($this->barangUnit->update($id, $data)) {
 
@@ -265,7 +289,6 @@ class Barang extends Controller
         // die;
 
         if (!$unit || empty($unit['qr_code'])) {
-            // throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
             return redirect()->back()
                 ->with('error', 'Halaman tidak ditemukan. Mohon Update data!');
         }
@@ -273,7 +296,6 @@ class Barang extends Controller
         $filePath = WRITEPATH . 'uploads/qr/' . $unit['qr_code'];
 
         if (!file_exists($filePath)) {
-            // throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("QR Code tidak ditemukan!");
             return redirect()->back()
                 ->with('error', 'QR Code belum dibuat. Mohon update data!');
         }

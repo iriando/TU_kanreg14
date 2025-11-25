@@ -6,7 +6,7 @@
         <h3 class="card-title">Tambah Unit Barang</h3>
     </div>
     <div class="card-body">
-        <form action="<?= base_url('barang/store-unit/' . $kode_barang) ?>" method="post">
+        <form action="<?= base_url('barang/store-unit/' . $kode_barang) ?>" method="post" enctype="multipart/form-data" >
             <?= csrf_field() ?> <!-- penting kalau CSRF aktif -->
 
             <div class="form-group">
@@ -35,6 +35,11 @@
                     <option value="kurang baik">Kurang Baik</option>
                     <option value="rusak">Rusak</option>
                 </select>
+            </div>
+
+            <div class="form-group">
+                <label>Gambar</label>
+                <input type="file" id="gambar" name="gambar" class="form-control">
             </div>
 
             <div class="form-group">

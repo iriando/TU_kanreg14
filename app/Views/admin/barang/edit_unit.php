@@ -6,7 +6,7 @@
         <h3 class="card-title">Edit Unit Barang</h3>
     </div>
     <div class="card-body">
-        <form action="<?= base_url('barang/update-unit/' . $unit['id']) ?>" method="post">
+        <form action="<?= base_url('barang/update-unit/' . $unit['id']) ?>" method="post" enctype="multipart/form-data" >
             <?= csrf_field() ?>
             <div class="form-group">
                 <label>Kode Unit</label>
@@ -32,6 +32,11 @@
                     <option value="kurang baik">Kurang Baik</option>
                     <option value="rusak">Rusak</option>
                 </select>
+            </div>
+
+            <div class="form-group">
+                <label>Gambar</label>
+                <input type="file" id="gambar" name="gambar" class="form-control">
             </div>
 
             <div class="mb-3">
