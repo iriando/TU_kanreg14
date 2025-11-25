@@ -45,7 +45,7 @@
             <p>Pemeliharaan</p>
           </a>
         </li>
-        <?php endif; ?>
+        
         
         <li class="nav-item">
           <a href="<?= base_url('logpegawai') ?>" class="nav-link">
@@ -55,8 +55,7 @@
           </a>
         </li>
 
-        <?php if (in_groups(['admin', 'petugas BMN'])): ?>
-          <li class="nav-header">Klinik</li>
+        <li class="nav-header">Klinik</li>
           <li class="nav-item">
             <a href="<?= base_url('rekammedis') ?>" class="nav-link">
               <i class="nav-icon fas fa-book-medical"></i>
