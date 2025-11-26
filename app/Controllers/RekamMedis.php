@@ -167,10 +167,27 @@ class RekamMedis extends BaseController
             }
         }
 
-        return redirect()->to('/rekammedis')
+        return redirect()->to('/rekammedis/view/' . $data['id_pegawai'])
             ->with('success', 'Rekam medis berhasil disimpan!');
     }
 
+    public function delete($id)
+    {
+        $riwayat = $this->rekamMedisModel->find($id);
+
+        if (!$riwayat) {
+            return redirect()->back()->with('error', 'Riwayat tidak ditemukan.');
+        }
+
+        $idPegawai = $riwayat->id_pegawai;
+
+        if ($this->rekamMedisModel->delete($id)) {
+            return redirect()->to('/rekammedis/view/' . $idPegawai)
+                ->with('success', 'Riwayat Rekam Medis berhasil dihapus.');
+        }
+
+        return redirect()->back()->with('error', 'Gagal menghapus riwayat.');
+    }
 
     // 🔄 fungsi recalcObat sama seperti di controller DistribusiObat
     private function recalcObat($kodeBarang)

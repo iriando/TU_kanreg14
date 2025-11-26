@@ -163,6 +163,7 @@ $routes->group('rekammedis', ['namespace' => 'App\Controllers'], function($route
         $routes->get('create/(:num)', 'RekamMedis::create/$1');
         $routes->post('store', 'RekamMedis::store');
         $routes->get('view/(:num)', 'RekamMedis::view/$1');
+        $routes->get('delete/(:num)', 'RekamMedis::delete/$1');
     });
 });
 

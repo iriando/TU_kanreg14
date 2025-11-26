@@ -61,6 +61,7 @@
                             <th>Keluhan</th>
                             <th>Keterangan</th>
                             <th>Obat Diberikan</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -85,6 +86,9 @@
                                     <?php else: ?>
                                         <span class="text-muted">Tidak ada obat</span>
                                     <?php endif; ?>
+                                </td>
+                                <td>
+                                    <a href="<?= site_url('rekammedis/delete/'.$r->id) ?>" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -122,5 +126,22 @@ function printRekamMedis() {
         pageTitle: "Rekam Medis Pasien", // judul di tab print
     });
 }
+
+    <?php if (session()->getFlashdata('success')): ?>
+        toastr.success("<?= session()->getFlashdata('success') ?>");
+    <?php endif; ?>
+
+    <?php if (session()->getFlashdata('error')): ?>
+        toastr.error("<?= session()->getFlashdata('error') ?>");
+    <?php endif; ?>
+
+    <?php if (session()->getFlashdata('warning')): ?>
+        toastr.warning("<?= session()->getFlashdata('warning') ?>");
+    <?php endif; ?>
+
+    <?php if (session()->getFlashdata('info')): ?>
+        toastr.info("<?= session()->getFlashdata('info') ?>");
+    <?php endif; ?>
+
 </script>
 <?= $this->endSection() ?>

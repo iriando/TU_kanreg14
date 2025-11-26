@@ -140,7 +140,7 @@ class DistribusiObat extends BaseController
 
         $this->distribusiobatModel->update($id, [
             'kode_barang'        => $kode,
-            'nama_barang'        => $obat['nama_barang'],
+            'nama_barang'        => $obat->nama_barang,
             'jumlah'             => (int) $this->request->getPost('jumlah'),
             'nama_penerima'      => $this->request->getPost('nama_penerima'),
             'tanggal_distribusi' => $this->request->getPost('tanggal_distribusi'),
@@ -151,7 +151,7 @@ class DistribusiObat extends BaseController
 
         $this->recalcObat($kode);
 
-        return redirect()->to('/distribusiobat')->with('message', 'Distribusi obat berhasil diupdate');
+        return redirect()->to('/distribusiobat')->with('success', 'Distribusi obat berhasil diupdate');
     }
 
     public function delete($id)
@@ -161,7 +161,7 @@ class DistribusiObat extends BaseController
             $this->distribusiobatModel->delete($id);
             $this->recalcObat($row->kode_barang);
         }
-        return redirect()->to('/distribusiobat')->with('message', 'Distribusi obat berhasil dihapus');
+        return redirect()->to('/distribusiobat')->with('success', 'Distribusi obat berhasil dihapus');
     }
 
     private function recalcObat(string $kodeBarang): void
