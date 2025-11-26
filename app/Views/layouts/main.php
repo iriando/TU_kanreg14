@@ -25,7 +25,9 @@
   <?= $this->include('layouts/navbar') ?>
 
   <!-- Sidebar -->
+  <?php if (in_groups(['admin', 'petugas BMN'])): ?>
   <?= $this->include('layouts/sidebar') ?>
+  <?php endif ?>
 
   <!-- Content Wrapper -->
   <div class="content-wrapper p-3">
