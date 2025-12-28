@@ -47,7 +47,7 @@ class CreateLogPeminjamanDetail extends Migration
 
         $this->forge->addKey('id', true);
         $this->forge->addForeignKey('peminjaman_id', 'log_peminjaman', 'id', 'CASCADE', 'CASCADE');
-        $this->forge->createTable('log_peminjaman_detail', true, ['ENGINE' => 'InnoDB', 'CHARSET' => 'utf8mb4', 'COLLATE' => 'utf8mb4_0900_ai_ci']);
+        $this->forge->createTable('log_peminjaman_detail', true, ['ENGINE' => 'InnoDB', 'CHARSET' => 'utf8mb4', 'COLLATE' => 'utf8mb4_unicode_ci']);
     }
 
     public function down()

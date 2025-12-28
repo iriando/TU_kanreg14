@@ -63,7 +63,7 @@ class CreateLogPeminjamanTables extends Migration
         ]);
 
         $this->forge->addKey('id', true); // primary key
-        $this->forge->createTable('log_peminjaman', true, ['ENGINE' => 'InnoDB', 'CHARSET' => 'utf8mb4', 'COLLATE' => 'utf8mb4_0900_ai_ci']);
+        $this->forge->createTable('log_peminjaman', true, ['ENGINE' => 'InnoDB', 'CHARSET' => 'utf8mb4', 'COLLATE' => 'utf8mb4_unicode_ci']);
     }
 
     public function down()

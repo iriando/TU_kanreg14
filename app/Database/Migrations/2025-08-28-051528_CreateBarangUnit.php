@@ -51,7 +51,7 @@ class CreateBarangUnitTable extends Migration
         $this->forge->addKey('id', true);
         $this->forge->addForeignKey('kode_barang', 'barang_master', 'kode_barang', 'CASCADE', 'CASCADE');
         $this->forge->addUniqueKey(['kode_barang', 'kode_unit']);
-        $this->forge->createTable('barang_unit', true, ['ENGINE' => 'InnoDB', 'CHARSET' => 'utf8mb4', 'COLLATE' => 'utf8mb4_0900_ai_ci']);
+        $this->forge->createTable('barang_unit', true, ['ENGINE' => 'InnoDB', 'CHARSET' => 'utf8mb4', 'COLLATE' => 'utf8mb4_unicode_ci']);
 
     }
 
